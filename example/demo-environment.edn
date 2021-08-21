@@ -1,0 +1,44 @@
+{:environment
+  {:name "Demo"
+   :comment "The ultimate Demo environment"}
+ :nodes
+  [{:name "Node-1"
+    :type "application"
+    :version "1.0"
+    :comment "The first node"
+    :deploymentDate "2021-08-04 21:45:32"
+    :subnodes []}
+   {:name "Node-2"
+    :type "application"
+    :version "2.0"
+    :deploymentDate "2021-08-04 03:00:00"
+    :subnodes
+      [{:name "SubNode-1"
+        :version "2.0.1"
+        :deploymentDate "2021-08-04 03:00:00"
+        :description "Subnode 1 of Node 2"}
+       {:name "SubNode-2"
+        :version "2.1.2"
+        :deployment-date "2021-08-04 13:10:00"
+        :description "Subnode 2 of Node 2"}]}]
+  :links
+  [{:name "N1 to SN1 of N2"
+    :type "interface"
+    :version "1.5"
+    :deploymentDate "2021-07-15 15:45:32"
+    :sourceNode "Node-1"
+    :sourceVersion "1.0"
+    :targetNode "Node-2"
+    :targetSubNode "SubNode-1"
+    :targetversion "2.0"
+    :targetSubNodeVersion "2.0.1"}
+   {:name "N1 to SN2 of N2"
+    :type "interface"
+    :version "1.6"
+    :deploymentDate "2021-07-15 15:45:32"
+    :sourceNode "Node-1"
+    :sourceVersion "1.0"
+    :targetNode "Node-2"
+    :targetSubNode "SubNode-2"
+    :targetversion "2.0"
+    :targetSubNodeVersion "2.1.2"}]}
