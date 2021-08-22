@@ -21,34 +21,34 @@
   (read-string (slurp "example/demo-environment.edn")))
 
 ;; Functies to encrypt-decrypt the config file
-(def lock "ClojureRules")
-(def file "vt-config.edn")
+; (def lock "ClojureRules")
+; (def file "vt-config.edn")
 
-(defn get-configuration
-  []
-  (let [result (try
-                 (read-string (decrypt-from-base64 (slurp file) lock))
-                 (catch Exception e
-                        (log/error (str " Can't find file: " file " Error: " (.getMessage e)))))]
-    (if (or (nil? result) (empty? result))
-      {:result "Can't find a configuration file"}
-      result)))
+; (defn get-configuration
+;   []
+;   (let [result (try
+;                  (read-string (decrypt-from-base64 (slurp file) lock))
+;                  (catch Exception e
+;                         (log/error (str " Can't find file: " file " Error: " (.getMessage e)))))]
+;     (if (or (nil? result) (empty? result))
+;       {:result "Can't find a configuration file"}
+;       result)))
+;
+;
+; (defn set-configuration
+;   [content]
+;   (let [result (try
+;                  (spit file (encrypt-as-base64 (str content) lock))
+;                  (catch Exception e
+;                         (log/error (str "Can't write file: " file " Error: " (.getMessage e)))))]
+;     (if (nil? result)
+;       {:result "Configuration file succesfully updated."}
+;       {:result result})))
+;
+; (defn check-configuration
+;   "Encrypt the config file if needed"
+;   []
+;   (when (= \{ (first (slurp file)))
+;     (set-configuration (read-string (slurp file)))))
 
-
-(defn set-configuration
-  [content]
-  (let [result (try
-                 (spit file (encrypt-as-base64 (str content) lock))
-                 (catch Exception e
-                        (log/error (str "Can't write file: " file " Error: " (.getMessage e)))))]
-    (if (nil? result)
-      {:result "Configuration file succesfully updated."}
-      {:result result})))
-
-(defn check-configuration
-  "Encrypt the config file if needed"
-  []
-  (when (= \{ (first (slurp file)))
-    (set-configuration (read-string (slurp file)))))
-
-(check-configuration)
+; (check-configuration)
