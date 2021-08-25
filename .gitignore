@@ -3,7 +3,6 @@
 /classes
 /checkouts
 pom.xml
-dev-config.edn
 test-config.edn
 *.jar
 *.class
@@ -21,4 +20,6 @@ shadow-cljs.edn
 shadow-cljs.edn.backup
 versiontracker_dev.mv.*
 versiontracker_dev.trace.*
+versiontracker_dev.db.mv.*
+versiontracker_dev.db.trace.*
 vt-config.edn

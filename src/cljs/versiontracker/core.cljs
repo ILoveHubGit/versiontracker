@@ -54,11 +54,11 @@
           date (:date formfields)
           uri (str "/api/environments/" env_name "/links"
                    (when-not (nil? date) (str "?date=" date)))]
-      {:http-xhrio {:method :get
-                    :uri uri
-                    :headers {"Accept" "application/json"}
+      {:http-xhrio {:method          :get
+                    :uri             uri
+                    :headers         {"Accept" "application/json"}
                     :response-format (http/json-response-format {:keywords? true})
-                    :on-failure [:set-error ::ret-links]}}))
+                    :on-failure      [:set-error ::ret-links]}}))
   (fn [{:keys [db]} [links]]
     {:db (assoc db :links (sort-by :name links))}))
 
@@ -68,6 +68,7 @@
   (fn [_ _]
     {:http-xhrio {:method          :get
                   :uri             "/api/environments"
+                  :headers         {"Accept" "application/json"}
                   :response-format (http/json-response-format {:keywords? true})
                   :on-failure      [:common/set-error]}})
   (fn [{:keys [db]} [_ environments]]

@@ -32,6 +32,7 @@ SELECT *
 FROM nodes
 
 -- :name get-nodes :?
+-- :doc Retrieve the nodes as deployed before :date, or the last situation
 SELECT name, type, version, deploymentdate AS depdate, comment
 FROM nodes
 WHERE id in (SELECT MAX(id)
@@ -39,6 +40,14 @@ WHERE id in (SELECT MAX(id)
               --~ (when (contains? params :date) "WHERE timestamp < :date")
               GROUP BY name)
 AND env_id = (SELECT id FROM environments WHERE name = :env_name)
+
+-- :name get-node :?
+-- :doc Retrieve a specific node from an environement
+SELECT name
+FROM nodes
+WHERE env_id = (SELECT id FROM environments WHERE name = :env_name)
+AND name = :nod_name
+AND version = :nod_version
 
 -- :name create-subnode! :! :n
 -- :doc Creates a new subnode for a node
@@ -64,6 +73,19 @@ WHERE id in (SELECT MAX(id)
                --~ (when (contains? params :date) "WHERE timestamp < :date")
                GROUP BY name)
 AND nod_id = (SELECT id FROM nodes WHERE name = :nod_name AND version = :nod_version)
+
+-- :name get-subnode :?
+-- :doc Retrieve a specific subnode from an environement
+SELECT name
+FROM subnodes
+WHERE nod_id = (SELECT id
+                FROM nodes
+                WHERE env_id = (SELECT id FROM environments WHERE name = :env_name)
+                AND name = :nod_name
+                AND version = :nod_version)
+AND name = :sub_name
+AND version = :sub_version
+
 
 -- :name create-link! :! :n
 -- :doc Creates a new link in the nevironment between existing (sub)nodes

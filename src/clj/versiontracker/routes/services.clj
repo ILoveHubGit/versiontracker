@@ -64,7 +64,7 @@
                              :body result})))}
        :get {:summary "Get the list of environments"
              :responses {200 {:body ::vt-vali/environments}}
-             :handler (constantly
+             :handler (fn [_]
                         (let [result (vt-data/ret-environments)]
                           (if (s/valid? ::vt-vali/environments result)
                             {:status 200
