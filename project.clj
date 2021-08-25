@@ -59,7 +59,9 @@
   :main ^:skip-aot versiontracker.core
 
   :plugins [[lein-kibit "0.1.2"]
-            [lein-shadow "0.4.0"]]
+            [lein-shadow "0.4.0"]
+            [lein-codox "0.10.7"]]
+  :codox {:output-path "docs"}
   :clean-targets ^{:protect false}
   [:target-path "target/cljsbuild"]
   :shadow-cljs

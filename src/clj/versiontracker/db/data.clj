@@ -10,10 +10,16 @@
 
 ;; Environments
 (defn add-environment!
-  "Adds new environment to database"
+  "Adds new environment to database
+   env - Should be a map with :name (required) and :comment (optional)
+
+   Aldonas novan medion al datumbazo
+   env - Devus esti mapo kun :name (bezonata) kaj :comment (nedeviga)"
   [env]
   (if (nil? env)
-    {:result "Can't add an empty environment"}
+    (do
+      (log/info (str "Environment name is missing, can't add environment"))
+      {:result "Can't add an empty environment"})
     (try
       (db/create-environment! {:name (:name env) :comment (:comment env)})
       (catch Exception e
@@ -21,12 +27,16 @@
              {:result (str "Error inserting to db: " e)}))))
 
 (defn ret-environments
-  "Retrieves the list of environments"
+  "Retrieves the list of environments
+
+   Rekuperas la liston de medioj"
   []
   (db/get-environments))
 
 (defn ret-environment
-  "Retrieves the dat either from API, file or db"
+  "Retrieves an environment
+
+   Rekuperas medio"
   [env-name]
   (if (nil? env-name)
     {:result "You need to specify the environment name"}
@@ -38,7 +48,9 @@
 
 ;; Nodes
 (defn add-node!
-  "Adds new node to an environment"
+  "Adds new node to an environment
+
+   Aldonas novan nodon al medio"
   [env-name node]
   (if-not (db-check/exist_env? env-name)
       {:result "Environment must exists before adding a node"}
@@ -54,7 +66,9 @@
                {:result (str "Error inserting to db: " e)}))))
 
 (defn prepare-nodes
-  "Convert the db result to the correct map"
+  "Convert the db result to the correct map
+
+   Konvertu la db-rezulton al la ĝusta mapo"
   [node]
   {:name (:name node)
    :type (:type node)
@@ -64,7 +78,9 @@
 
 
 (defn ret-nodes
-  "Retrieves a list of nodes from an environment"
+  "Retrieves a list of nodes from an environment
+
+   Rekuperas liston de nodoj el medio"
   [env-name date]
   (if-not (db-check/exist_env? env-name)
     {:result "Cannot find the environment for requested node"}
@@ -76,7 +92,9 @@
 
 ;; SubNodes
 (defn add-subnode!
-  "Adds new subnode to a node"
+  "Adds new subnode to a node
+
+   Aldonas nuvon subnodon al nodo"
   [env-name nod-name nod-version subnode]
   (if-not (and (db-check/exist_env? env-name)
                (db-check/exist_node? env-name nod-name nod-version))
@@ -95,7 +113,9 @@
       {:result "SubNode succesfully added"})))
 
 (defn ret-subnodes
-  "Retrieves a list of subnodes for a node"
+  "Retrieves a list of subnodes for a node
+
+   Rekuperas liston de subnodoj el nodo"
   [env-name nod-name nod-version date]
   (if-not (and (db-check/exist_env? env-name)
                (db-check/exist_node? env-name nod-name nod-version))
@@ -107,7 +127,9 @@
       (db/get-subnodes params))))
 
 (defn prepare-link-params
-  "creates the params for link insertion"
+  "Creates the params for link insertion
+
+   Kreas la parametrojn por ligilo"
   [env-name link]
   {:env_name env-name
    :name (:name link)
@@ -117,7 +139,9 @@
    :comment (:comment link)})
 
 (defn add-link!
-  "Adds new link to an environment"
+  "Adds new link to an environment
+
+   Aldonas novan ligon al medio"
   [env-name link]
   (if-not (db-check/exist_env? env-name)
     {:result "Empty parameters are not allowed"}
@@ -135,7 +159,7 @@
                                        :sub_name (:SubNode source) :sub_version (:SubVersion source)})
                    0)
           target (:target link)
-          tar-in (if-not (and (nil? target) 
+          tar-in (if-not (and (nil? target)
                               (db-check/exist_node? env-name (:Node target) (:Version target))
                               (db-check/exist_subnode? env-name (:Node target) (:Version target) (:SubNode target) (:SubVersion target)))
                    (db/create-target! {:lin_id lin-id
@@ -151,7 +175,9 @@
 
 
 (defn prepare-links
-  "Convert the db result to the correct map"
+  "Convert the db result to the correct map
+
+   Konvertu la db-rezulton al la ĝusta mapo"
   [link]
   {:name (:name link)
    :type (:type link)
@@ -170,7 +196,9 @@
 
 
 (defn ret-links
-  "Retrieves a list of links from an environment"
+  "Retrieves a list of links from an environment
+
+   Rekuperas liston de ligoj el medio"
   [env-name date]
   (if-not (db-check/exist_env? env-name)
     {:result "Cannot find the environment for requested node"}
@@ -182,7 +210,9 @@
     ; (println links)))
 
 (defn add-source!
-  "Adds new source to a link in the environment"
+  "Adds new source to a link in the environment
+
+   Aldonas novan fonto al ligo en la medio"
   [env-name link-name link-version source]
   (if-not (db-check/exist_env? env-name)
     {:result "Cannot find the environment for requested link"}
@@ -199,7 +229,9 @@
         {:result "Source succesfully added to the link"}))))
 
 (defn add-target!
-  "Adds new target to a link in the environment"
+  "Adds new target to a link in the environment
+
+   Aldonas novan celo al ligo en la medio"
   [env-name link-name link-version target]
   (if-not (db-check/exist_env? env-name)
     {:result "Cannot find the environment for requested link"}

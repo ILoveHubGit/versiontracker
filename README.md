@@ -1,5 +1,5 @@
-# Version Tracker
-The intention of this client-server application is to visualize the architectural landscape of an IT-environment.
+# Version Tracker  (Version 0.1.0-SNAPSHOT)
+The intention of this client-server application is to visualize the architectural landscape of an IT-environment. Within a environment, applications and/or systems can be added as nodes and their submodules/functions as subnodes. These can then be linked together through there interfaces.
 
 
 ## Prerequisites
