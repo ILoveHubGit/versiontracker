@@ -132,8 +132,6 @@
                                        :sub_name (:SubNode target) :sub_version (:SubVersion target)})
                    0)
           result (str lin-in sou-in tar-in)]
-      (println "link: " link
-               " params: " params)
       (case result
             "100" {:result "The link with neither source nor target was added"}
             "110" {:result "The link with source and without target was added"}
@@ -149,6 +147,7 @@
    :version (:version link)
    :deploymentdate (str (:depdate link))
    :comment (:comment link)
+   :insertdate (:insertdate link)
    :source {:Node (:sourcename link)
             :Version (:sourceversion link)
             :SubNode (:sourcesubnode link)

@@ -1,4 +1,4 @@
-# Version-tracker
+# Version Tracker
 The intention of this client-server application is to visualize the architectural landscape of an IT-environment.
 
 

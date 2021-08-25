@@ -79,7 +79,7 @@ FROM links
 
 -- :name get-links :?
 -- :doc "Retrieve the links from an enviroment"
-SELECT l.name, l.type, l.version, l.deploymentdate AS depdate, l.comment,
+SELECT l.name, l.type, l.version, l.deploymentdate AS depdate, l.comment, FORMATDATETIME(l.timestamp, 'yyyy-MM-dd HH:mm:ss') AS insertdate,
        sn.name AS sourceName, sn.version AS sourceVersion, ssn.name AS sourceSubNode, ssn.version AS sourceSubVersion,
        tn.name AS targetName, tn.version AS targetVersion, tsn.name AS targetSubNode, tsn.version AS targetSubVersion
 FROM links as l
@@ -94,6 +94,7 @@ WHERE l.id in (SELECT MAX(id)
                --~ (when (contains? params :date) "WHERE timestamp < :date")
                GROUP BY name)
 AND l.env_id = (SELECT id FROM environments WHERE name = :env_name)
+AND (s.nod_id <> -1 OR t.nod_id <> -1)
 
 -- :name create-source! :! :n
 -- :doc Adds a new version of a source to a link

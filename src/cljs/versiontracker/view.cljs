@@ -1,11 +1,11 @@
 (ns versiontracker.view
-  (:require
-    [kee-frame.core :as kf]
-    [markdown.core :refer [md->html]]
-    [reagent.core :as r]
-    [re-frame.core :as rf]
-    [versiontracker.validation :as vt-vali]
-    [versiontracker.forms.controls :as forms]))
+  (:require [clojure.string :as c-str]
+            [kee-frame.core :as kf]
+            [markdown.core :refer [md->html]]
+            [reagent.core :as r]
+            [re-frame.core :as rf]
+            [versiontracker.validation :as vt-vali]
+            [versiontracker.forms.controls :as forms]))
 
 (defn nav-link [title page]
   [:a.navbar-item
@@ -35,17 +35,20 @@
 
 (defn make-row
   [link]
-  [:tr
-   [:td (:Node (:source link))]
-   [:td (:Version (:source link))]
-   [:td (:SubNode (:source link))]
-   [:td (:SubVersion (:source link))]
-   [:td [:abbr {:title (:type link)} (:name link)]]
-   [:td (:version link)]
-   [:td (:Node (:target link))]
-   [:td (:Version (:target link))]
-   [:td (:SubNode (:target link))]
-   [:td (:SubVersion (:target link))]])
+  (let [type (c-str/lower-case (:type link))]
+    [:tr
+     [:td (:Node (:source link))]
+     [:td (:Version (:source link))]
+     [:td (:SubNode (:source link))]
+     [:td (:SubVersion (:source link))]
+     [:td (:name link)]
+     [:td (:version link)]
+     [:td [:img {:src (str "/img/" type ".png") :title type :width 24}]]
+     [:td (:insertdate link)]
+     [:td (:Node (:target link))]
+     [:td (:Version (:target link))]
+     [:td (:SubNode (:target link))]
+     [:td (:SubVersion (:target link))]]))
 
 (defn home-page []
   [:section.section>div.container>div.content
@@ -66,21 +69,23 @@
      [:div.table-container
       [:table.table.is-bordered.is-striped.is-narrow.is-hoverable
        [:thead
-        [:tr
-         [:th.has-text-centered {:colspan 4} "Source"]
-         [:th.has-text-centered {:colspan 2} "Interface"]
-         [:th.has-text-centered {:colspan 4} "Target"]]
-        [:tr
-         [:th "Application"]
-         [:th "Version"]
-         [:th "Function"]
-         [:th "Sub Version"]
-         [:th "Interface"]
-         [:th "Version"]
-         [:th "Application"]
-         [:th "Version"]
-         [:th "Function"]
-         [:th "Sub Version"]]]
+        [:tr.color-blue
+         [:th.has-text-centered.has-text-white {:colspan 4} "Source"]
+         [:th.has-text-centered.has-text-white {:colspan 4} "Interface"]
+         [:th.has-text-centered.has-text-white {:colspan 4} "Target"]]
+        [:tr.color-blue
+         [:th.has-text-white "Application"]
+         [:th.has-text-white "Version"]
+         [:th.has-text-white "Function"]
+         [:th.has-text-white "Sub Version"]
+         [:th.has-text-white "Interface"]
+         [:th.has-text-white "Version"]
+         [:th.has-text-white "Type"]
+         [:th.has-text-white "Date"]
+         [:th.has-text-white "Application"]
+         [:th.has-text-white "Version"]
+         [:th.has-text-white "Function"]
+         [:th.has-text-white "Sub Version"]]]
        [:tbody
         (map #(make-row %) links)]]])])
 
