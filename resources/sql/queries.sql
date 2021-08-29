@@ -37,7 +37,7 @@ SELECT name, type, version, deploymentdate AS depdate, comment
 FROM nodes
 WHERE id in (SELECT MAX(id)
               FROM nodes
-              --~ (when (contains? params :date) "WHERE timestamp < :date")
+              --~ (if (contains? params :date) "WHERE timestamp < :date" "WHERE timestamp < CURRENT_TIMESTAMP")
               GROUP BY name)
 AND env_id = (SELECT id FROM environments WHERE name = :env_name)
 
@@ -70,7 +70,7 @@ SELECT name, version, deploymentdate AS depdate, comment
 FROM subnodes
 WHERE id in (SELECT MAX(id)
                FROM subnodes
-               --~ (when (contains? params :date) "WHERE timestamp < :date")
+               --~ (if (contains? params :date) "WHERE timestamp < :date" "WHERE timestamp < CURRENT_TIMESTAMP")
                GROUP BY name)
 AND nod_id = (SELECT id FROM nodes WHERE name = :nod_name AND version = :nod_version)
 
@@ -106,17 +106,26 @@ SELECT l.name, l.type, l.version, l.deploymentdate AS depdate, l.comment, FORMAT
        tn.name AS targetName, tn.version AS targetVersion, tsn.name AS targetSubNode, tsn.version AS targetSubVersion
 FROM links as l
 LEFT OUTER JOIN sources AS s ON l.id = s.lin_id
+                            AND s.nod_id IN (SELECT MAX(nod_id)
+                                             FROM sources
+                                             --~ (if (contains? params :date) "WHERE timestamp < :date" "WHERE timestamp < CURRENT_TIMESTAMP")
+                                             AND lin_id = s.lin_id
+                                             GROUP BY lin_id)
 LEFT OUTER JOIN nodes AS sn ON s.nod_id = sn.id
 LEFT OUTER JOIN subnodes AS ssn ON s.sub_id = ssn.id
 LEFT OUTER JOIN targets AS t ON l.id = t.lin_id
+                            AND t.nod_id IN (SELECT MAX(nod_id)
+                                             FROM targets
+                                             --~ (if (contains? params :date) "WHERE timestamp < :date" "WHERE timestamp < CURRENT_TIMESTAMP")
+                                             AND lin_id = t.lin_id
+                                             GROUP BY lin_id)
 LEFT OUTER JOIN nodes AS tn ON t.nod_id = tn.id
 LEFT OUTER JOIN subnodes AS tsn ON t.sub_id = tsn.id
-WHERE l.id in (SELECT MAX(id)
+WHERE l.id IN (SELECT MAX(id)
                FROM links
-               --~ (when (contains? params :date) "WHERE timestamp < :date")
+               --~ (if (contains? params :date) "WHERE timestamp < :date" "WHERE timestamp < CURRENT_TIMESTAMP")
                GROUP BY name)
 AND l.env_id = (SELECT id FROM environments WHERE name = :env_name)
-AND (s.nod_id <> -1 OR t.nod_id <> -1)
 
 -- :name create-source! :! :n
 -- :doc Adds a new version of a source to a link

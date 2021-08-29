@@ -7,6 +7,8 @@
             [clojure.tools.logging :as log]))
 
 ; (def vt-config (config/get-configuration))
+(declare add-source!)
+(declare add-target!)
 
 ;; Environments
 (defn add-environment!
@@ -143,6 +145,8 @@
 
    Aldonas novan ligon al medio"
   [env-name link]
+  (println "Source: " (:source link))
+  (println "Target: " (:target link))
   (if-not (db-check/exist_env? env-name)
     {:result "Empty parameters are not allowed"}
     (let [params (prepare-link-params env-name link)
@@ -151,13 +155,15 @@
                                        :name (:name link)
                                        :version (:version link)}))
           source (:source link)
-          sou-in (if (and (not (nil? source))
-                          (db-check/exist_node? env-name (:Node source) (:Version source))
-                          (db-check/exist_subnode? env-name (:Node source) (:Version source) (:SubNode source) (:SubVersion source)))
+          sou-in (if-not (and (nil? source)
+                              (db-check/exist_node? env-name (:Node source) (:Version source))
+                              (db-check/exist_subnode? env-name (:Node source) (:Version source) (:SubNode source) (:SubVersion source)))
                    (db/create-source! {:lin_id lin-id
                                        :nod_name (:Node source) :nod_version (:Version source)
                                        :sub_name (:SubNode source) :sub_version (:SubVersion source)})
-                   0)
+                   (db/create-source! {:lin_id lin-id
+                                       :nod_name -1 :nod_version -1
+                                       :sub_name -1 :sub_version -1}))
           target (:target link)
           tar-in (if-not (and (nil? target)
                               (db-check/exist_node? env-name (:Node target) (:Version target))
@@ -165,7 +171,9 @@
                    (db/create-target! {:lin_id lin-id
                                        :nod_name (:Node target) :nod_version (:Version target)
                                        :sub_name (:SubNode target) :sub_version (:SubVersion target)})
-                   0)
+                   (db/create-target! {:lin_id lin-id
+                                       :nod_name -1 :nod_version -1
+                                       :sub_name -1 :sub_version -1}))
           result (str lin-in sou-in tar-in)]
       (case result
             "100" {:result "The link with neither source nor target was added"}
@@ -206,8 +214,7 @@
           params (if-not (nil? date)
                    (assoc base :date date)
                    base)]
-      (map #(prepare-links %) (db/get-links params)))))
-    ; (println links)))
+      (map #(prepare-links %) (db/get-links1 params)))))
 
 (defn add-source!
   "Adds new source to a link in the environment

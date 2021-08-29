@@ -1,5 +1,5 @@
 # Version Tracker  (Version 0.1.0-SNAPSHOT)
-The intention of this client-server application is to visualize the architectural landscape of an IT-environment. Within an environment, applications and/or systems can be added as nodes and their submodules/functions as subnodes. These can than be linked together through there interfaces.
+The intention of this application is to visualize the architectural landscape of an IT-environment. Within an environment, applications and/or systems can be added as nodes and these can have subnodes which may represent submodules/functions. Then both nodes and subnodes can than be linked together through there interfaces.
 
 
 ## Prerequisites
