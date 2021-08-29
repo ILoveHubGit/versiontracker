@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-0">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-17">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-16">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-15">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-14">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-13">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-12">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-11">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-10">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-9">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-8">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-7">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-6">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-5">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-4">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-3">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-2">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="128.229" y1="7.634" x2="128.229" y2="247.821" id="gradient-1">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+  </defs>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-0);" d="M 101.146 47.438 L 97.874 38.986 L 106.053 28.899 L 92.967 16.63 L 82.607 23.174 L 74.973 20.175 L 72.792 7.634 L 54.799 7.634 L 52.89 20.175 L 45.257 23.174 L 34.624 16.358 L 22.083 28.899 L 29.444 39.259 L 26.99 46.347 L 13.632 48.801 L 13.904 66.794 L 25.9 69.521 L 29.717 76.337 L 22.628 86.969 L 34.897 99.783"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-17);" d="M 98.692 162.76 L 168.759 162.76"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-16);" d="M 164.396 162.76 L 164.396 236.139 L 179.665 236.139"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-15);" d="M 141.223 163.033 L 141.223 236.371 L 126.49 236.371"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-14);" d="M 102.509 162.488 L 102.236 213.197 L 87.514 213.197"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-13);" d="M 180.481 225.465 L 202.837 225.465 L 202.837 247.821 L 180.481 247.821 L 180.481 225.465 Z"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-12);" d="M 103.327 224.92 L 125.683 224.92 L 125.683 247.276 L 103.327 247.276 L 103.327 224.92 Z"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-11);" d="M 64.613 202.019 L 86.969 202.019 L 86.969 224.375 L 64.613 224.375 L 64.613 202.019 Z"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-10);" d="M 94.875 135.497 L 105.781 147.22"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-9);" d="M 105.781 124.319 L 95.148 135.497"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-8);" d="M 147.766 135.224 L 95.148 135.224"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-7);" d="M 173.666 116.141 L 162.76 127.864"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-6);" d="M 162.76 104.963 L 173.393 116.141"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-5);" d="M 120.775 115.868 L 173.393 115.868"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-4);" d="M 40.077 178.573 C 54.459 190.945 56.497 190.356 124.763 190.487 C 207.694 190.646 214.119 191.385 221.376 183.208"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-3);" d="M 153.491 52.345 C 171.28 49.379 199.225 69.951 194.386 93.785"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-2);" d="M 30.262 165.214 C 13.314 126.193 47.72 104.923 57.252 102.509 C 56.703 65.778 89.115 61.693 103.054 67.34 C 122.492 24.581 212.807 21.993 209.925 102.236 C 248.819 115.412 249.794 158.111 230.645 176.665"/>
+  <path style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: url(#gradient-1);" d="M 84.243 54.253 C 71.124 17.389 25.667 49.58 52.618 74.973"/>
+</svg>

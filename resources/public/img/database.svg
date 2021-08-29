@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-0" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-28" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-27" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-26" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-25" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-24" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-23" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-22" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-21" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-20" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-19" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-18" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-17" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-16" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32.17" y1="10.792" x2="32.17" y2="24.696" id="gradient-15" gradientTransform="matrix(3.058882, 0, 0, 3.058882, -66.23422, -22.219451)">
+      <stop offset="0" style="stop-color: rgb(62, 142, 208);"/>
+      <stop offset="1" style="stop-color: rgb(148, 8, 97);"/>
+    </linearGradient>
+  </defs>
+  <path d="M 11.451 10.792 L 52.89 10.792 C 53.794 10.792 54.526 11.524000000000001 54.526 12.428 L 54.526 23.06 C 54.526 23.964 53.794 24.696 52.89 24.696 L 11.451 24.696 C 10.547 24.696 9.815 23.964 9.815 23.06 L 9.815 12.428 C 9.815 11.524000000000001 10.547 10.792 11.451 10.792 Z" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-0); paint-order: fill; fill: none; stroke-width: 1.5px;"/>
+  <path d="M 47.665 45.995 C 47.665 46.657 47.113 47.194 46.433 47.194 C 45.752 47.194 45.2 46.657 45.2 45.995 C 45.2 45.333 45.752 44.797 46.433 44.797 C 47.113 44.797 47.665 45.333 47.665 45.995 Z" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-28); paint-order: fill; fill: none; stroke-width: 1.5px;"/>
+  <path d="M 42.042 46.063 C 42.042 46.725 41.49 47.261 40.809 47.261 C 40.128 47.261 39.577 46.725 39.577 46.063 C 39.577 45.401 40.128 44.864 40.809 44.864 C 41.49 44.864 42.042 45.401 42.042 46.063 Z" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-27); paint-order: fill; fill: none; stroke-width: 1.5px;"/>
+  <path d="M 47.568 31.853 C 47.568 32.515 47.017 33.051 46.336 33.051 C 45.655 33.051 45.103 32.515 45.103 31.853 C 45.103 31.191 45.655 30.654 46.336 30.654 C 47.017 30.654 47.568 31.191 47.568 31.853 Z" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-26); paint-order: fill; fill: none; stroke-width: 1.5px;"/>
+  <path d="M 41.945 31.92 C 41.945 32.582 41.393 33.119 40.712 33.119 C 40.032 33.119 39.48 32.582 39.48 31.92 C 39.48 31.258 40.032 30.722 40.712 30.722 C 41.393 30.722 41.945 31.258 41.945 31.92 Z" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-25); paint-order: fill; fill: none; stroke-width: 1.5px;"/>
+  <path d="M 47.665 17.982 C 47.665 18.644 47.113 19.181 46.433 19.181 C 45.752 19.181 45.2 18.644 45.2 17.982 C 45.2 17.32 45.752 16.784 46.433 16.784 C 47.113 16.784 47.665 17.32 47.665 17.982 Z" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-24); paint-order: fill; fill: none; stroke-width: 1.5px;"/>
+  <path d="M 42.042 18.05 C 42.042 18.712 41.49 19.248 40.809 19.248 C 40.128 19.248 39.577 18.712 39.577 18.05 C 39.577 17.388 40.128 16.851 40.809 16.851 C 41.49 16.851 42.042 17.388 42.042 18.05 Z" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-23); paint-order: fill; fill: none; stroke-width: 1.5px;"/>
+  <path d="M 11.451 25.139 L 52.89 25.139 C 53.794 25.139 54.526 25.871 54.526 26.775 L 54.526 37.407 C 54.526 38.311 53.794 39.043 52.89 39.043 L 11.451 39.043 C 10.547 39.043 9.815 38.311 9.815 37.407 L 9.815 26.775 C 9.815 25.871 10.547 25.139 11.451 25.139 Z" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-22); paint-order: fill; fill: none; stroke-width: 1.5px;"/>
+  <path d="M 11.451 39.486 L 52.89 39.486 C 53.794 39.486 54.526 40.218 54.526 41.122 L 54.526 51.754 C 54.526 52.658 53.794 53.39 52.89 53.39 L 11.451 53.39 C 10.547 53.39 9.815 52.658 9.815 51.754 L 9.815 41.122 C 9.815 40.218 10.547 39.486 11.451 39.486 Z" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-21); paint-order: fill; fill: none; stroke-width: 1.5px;"/>
+  <path d="M 14.858 6.634 L 49.209 6.634 C 49.887 6.634 50.436 7.183 50.436 7.861 L 50.436 9.565 C 50.436 10.243 49.887 10.792 49.209 10.792 L 14.858 10.792 C 14.18 10.792 13.631 10.243 13.631 9.565 L 13.631 7.861 C 13.631 7.183 14.18 6.634 14.858 6.634 Z" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-20); paint-order: fill; fill: none; stroke-width: 1.5px;"/>
+  <path d="M 15.131 53.44 L 24.878 53.44 C 25.593 53.44 26.173 54.02 26.173 54.735 L 26.173 55.231 C 26.173 55.946 25.593 56.526 24.878 56.526 L 15.131 56.526 C 14.416 56.526 13.836 55.946 13.836 55.231 L 13.836 54.735 C 13.836 54.02 14.416 53.44 15.131 53.44 Z" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-19); paint-order: fill; fill: none; stroke-width: 1.5px;"/>
+  <path d="M 16.205 45.963 L 33.927 45.961" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-18); paint-order: fill; fill: none; stroke-dasharray: 4; stroke-width: 1.5px;"/>
+  <path d="M 39.088 53.39 L 48.835 53.39 C 49.55 53.39 50.13 53.97 50.13 54.685 L 50.13 55.181 C 50.13 55.896 49.55 56.476 48.835 56.476 L 39.088 56.476 C 38.373 56.476 37.793 55.896 37.793 55.181 L 37.793 54.685 C 37.793 53.97 38.373 53.39 39.088 53.39 Z" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-17); paint-order: fill; fill: none; stroke-width: 1.5px;"/>
+  <path d="M 16.272 31.99 L 33.994 31.988" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-16); paint-order: fill; fill: none; stroke-dasharray: 4; stroke-width: 1.5px;"/>
+  <path d="M 16 18.017 L 33.722 18.015" style="stroke-linecap: round; stroke-linejoin: round; stroke: url(#gradient-15); paint-order: fill; fill: none; stroke-dasharray: 4; stroke-width: 1.5px;"/>
+</svg>

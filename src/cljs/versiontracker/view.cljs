@@ -43,7 +43,7 @@
      [:td (:SubVersion (:source link))]
      [:td (:name link)]
      [:td (:version link)]
-     [:td [:img {:src (str "/img/" type ".png") :title type :width 24}]]
+     [:td [:img {:src (str "/img/" type ".svg") :title type :width 32}]]
      [:td (:insertdate link)]
      [:td (:Node (:target link))]
      [:td (:Version (:target link))]
