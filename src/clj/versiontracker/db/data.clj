@@ -214,7 +214,7 @@
           params (if-not (nil? date)
                    (assoc base :date date)
                    base)]
-      (map #(prepare-links %) (db/get-links1 params)))))
+      (map #(prepare-links %) (db/get-links params)))))
 
 (defn add-source!
   "Adds new source to a link in the environment

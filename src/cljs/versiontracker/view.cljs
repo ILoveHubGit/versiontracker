@@ -41,7 +41,7 @@
      [:td (:Version (:source link))]
      [:td (:SubNode (:source link))]
      [:td (:SubVersion (:source link))]
-     [:td (:name link)]
+     [:td [:abbr {:title (str "Deployed on: " (:deploymentdate link))} (:name link)]]
      [:td (:version link)]
      [:td [:img {:src (str "/img/" type ".svg") :title type :width 32}]]
      [:td (:insertdate link)]
@@ -70,9 +70,9 @@
       [:table.table.is-bordered.is-striped.is-narrow.is-hoverable
        [:thead
         [:tr.color-blue
-         [:th.has-text-centered.has-text-white {:colspan 4} "Source"]
-         [:th.has-text-centered.has-text-white {:colspan 4} "Interface"]
-         [:th.has-text-centered.has-text-white {:colspan 4} "Target"]]
+         [:th.has-text-centered.has-text-white {:colSpan 4} "Source"]
+         [:th.has-text-centered.has-text-white {:colSpan 4} "Interface"]
+         [:th.has-text-centered.has-text-white {:colSpan 4} "Target"]]
         [:tr.color-blue
          [:th.has-text-white "Application"]
          [:th.has-text-white "Version"]
