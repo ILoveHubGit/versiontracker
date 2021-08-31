@@ -6,14 +6,18 @@
             [clojure.tools.logging :as log]))
 
 (defn exist_env?
-  "Check if the environemnt exists in the database"
+  "Returns 'true' when the environment exists in the database
+
+  Liveras 'true' kiam la medio ekzistas en la datumbazo"
   [env-name]
   (if (= 1 (count (db/get-environment {:env_name env-name})))
     true
     false))
 
 (defn exist_node?
-  "Check if the environemnt exists in the database"
+  "Returns 'true' when the environment, node with node version combination exists in the database
+
+  Liveras 'true' kiam la medio, la nodo kun la nodo versio ekzistas en la datumbazo"
   [env-name nod-name nod-version]
   (if (= 1 (count (db/get-node {:env_name env-name
                                 :nod_name nod-name
@@ -22,7 +26,11 @@
     false))
 
 (defn exist_subnode?
-  "Check if the environemnt exists in the database"
+  "Returns 'true' when requested with subnode name is 'nil' or when the environment,
+  node with version and subnode with version exists in the database
+
+  Liveras 'true' kiam petite kun la nomo de subnodo estas 'nil' aŭ kiam la medio,
+   nodo kun versio kaj subnodo kun versio ekzistas en la datumbazo"
   [env-name nod-name nod-version sub-name sub-version]
   (if (nil? sub-name)
     true

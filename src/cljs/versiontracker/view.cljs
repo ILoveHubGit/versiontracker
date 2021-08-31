@@ -7,6 +7,8 @@
             [versiontracker.validation :as vt-vali]
             [versiontracker.forms.controls :as forms]))
 
+(def log (.-log js/console))
+
 (defn nav-link [title page]
   [:a.navbar-item
    {:href   (kf/path-for [page])
@@ -50,6 +52,40 @@
      [:td (:SubNode (:target link))]
      [:td (:SubVersion (:target link))]]))
 
+(def select-view (r/atom true))
+
+(defn table-view
+  [links]
+  [:div {:hidden (not @select-view)}
+   [:div.table-container
+    [:table.table.is-bordered.is-striped.is-narrow.is-hoverable
+     [:thead
+      [:tr.color-blue
+       [:th.has-text-centered.has-text-white {:colSpan 4} "Source"]
+       [:th.has-text-centered.has-text-white {:colSpan 4} "Interface"]
+       [:th.has-text-centered.has-text-white {:colSpan 4} "Target"]]
+      [:tr.color-blue
+       [:th.has-text-white "Application"]
+       [:th.has-text-white "Version"]
+       [:th.has-text-white "Function"]
+       [:th.has-text-white "Sub Version"]
+       [:th.has-text-white "Interface"]
+       [:th.has-text-white "Version"]
+       [:th.has-text-white "Type"]
+       [:th.has-text-white "Date"]
+       [:th.has-text-white "Application"]
+       [:th.has-text-white "Version"]
+       [:th.has-text-white "Function"]
+       [:th.has-text-white "Sub Version"]]]
+     [:tbody
+      (map #(make-row %) links)]]]])
+
+(defn graph-view
+  [links]
+  [:div {:hidden @select-view}
+    [:div "Hier komt de graph"]])
+
+
 (defn home-page []
   [:section.section>div.container>div.content
    [:div.columns
@@ -66,28 +102,15 @@
       {:on-click #(rf/dispatch [:ret-links])}
       "Get Interfaces"]]]
    (when-let [links @(rf/subscribe [:links])]
-     [:div.table-container
-      [:table.table.is-bordered.is-striped.is-narrow.is-hoverable
-       [:thead
-        [:tr.color-blue
-         [:th.has-text-centered.has-text-white {:colSpan 4} "Source"]
-         [:th.has-text-centered.has-text-white {:colSpan 4} "Interface"]
-         [:th.has-text-centered.has-text-white {:colSpan 4} "Target"]]
-        [:tr.color-blue
-         [:th.has-text-white "Application"]
-         [:th.has-text-white "Version"]
-         [:th.has-text-white "Function"]
-         [:th.has-text-white "Sub Version"]
-         [:th.has-text-white "Interface"]
-         [:th.has-text-white "Version"]
-         [:th.has-text-white "Type"]
-         [:th.has-text-white "Date"]
-         [:th.has-text-white "Application"]
-         [:th.has-text-white "Version"]
-         [:th.has-text-white "Function"]
-         [:th.has-text-white "Sub Version"]]]
-       [:tbody
-        (map #(make-row %) links)]]])])
+     (log "Select-view: " @select-view)
+     [:div
+      [:div.tabs
+       [:ul
+        [:li.is-active [:a {:on-click (fn [] (reset! select-view true) (log "Table-view: " @select-view))} "Table View"]]
+        [:li [:a {:on-click (fn [] (reset! select-view false) (log "Graph-view: " @select-view))} "Graph View"]]]]
+      (if @select-view
+        (table-view links)
+        (graph-view links))])])
 
 
 
