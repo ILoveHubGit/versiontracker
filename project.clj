@@ -61,7 +61,8 @@
   :plugins [[lein-kibit "0.1.2"]
             [lein-shadow "0.4.0"]
             [lein-codox "0.10.7"]]
-  :codox {:output-path "docs"}
+  :codox {:output-path "docs"
+          :source-uri "https://github.com/ILoveHubGit/versiontracker/tree/main/{filepath}#L{line}"}
   :clean-targets ^{:protect false}
   [:target-path "target/cljsbuild"]
   :shadow-cljs
