@@ -193,12 +193,16 @@
    :deploymentdate (str (:depdate link))
    :comment (:comment link)
    :insertdate (:insertdate link)
-   :source {:Node (:sourcename link)
+   :source {:id (:sourceid link)
+            :Node (:sourcename link)
             :Version (:sourceversion link)
+            :subId (:sourcesubid link)
             :SubNode (:sourcesubnode link)
             :SubVersion (:sourcesubversion link)}
-   :target {:Node (:targetname link)
+   :target {:id (:targetid link)
+            :Node (:targetname link)
             :Version (:targetversion link)
+            :subId (:targetsubid link)
             :SubNode (:targetsubnode link)
             :SubVersion (:targetsubversion link)}})
 

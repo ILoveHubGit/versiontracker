@@ -141,8 +141,8 @@ FROM links
    Params: {:env_name "name" :date "date-time"} :date is optional - estas nedeviga
 */
 SELECT l.name, l.type, l.version, l.deploymentdate AS depdate, l.comment, FORMATDATETIME(l.timestamp, 'yyyy-MM-dd HH:mm:ss') AS insertdate,
-       sn.name AS sourceName, sn.version AS sourceVersion, ssn.name AS sourceSubNode, ssn.version AS sourceSubVersion,
-       tn.name AS targetName, tn.version AS targetVersion, tsn.name AS targetSubNode, tsn.version AS targetSubVersion
+       sn.id AS sourceId, sn.name AS sourceName, sn.version AS sourceVersion, ssn.id AS sourceSubId, ssn.name AS sourceSubNode, ssn.version AS sourceSubVersion,
+       tn.id AS targetId, tn.name AS targetName, tn.version AS targetVersion, tsn.id AS targetSubId, tsn.name AS targetSubNode, tsn.version AS targetSubVersion
 FROM links as l
 LEFT OUTER JOIN sources AS s ON l.id = s.lin_id
                             AND s.nod_id IN (SELECT MAX(nod_id)

@@ -39,7 +39,7 @@
    ;; swagger documentation
    ["" {:no-doc true
         :swagger {:info {:title "Version Tracker"
-                         :description "https://cljdoc.org/d/metosin/reitit"}}}
+                         :description "Easy to integrate with CI/CD"}}}
 
     ["/swagger.json"
      {:get (swagger/create-swagger-handler)}]
