@@ -1,38 +1,51 @@
 -- :name create-environment! :! :n
--- :doc creates a new environment record
+/* :doc Creates a new environment record
+   Kreas novan median rekordon
+   Params: {:env_name "name" :comment "comment"}
+*/
 INSERT INTO environments
 (name, comment)
 VALUES (:name, :comment);
 
 -- :name get-environments :?
--- :doc Retrieves the list of environments
+/* :doc Retrieves the list of environments
+   Rekuperas la liston de medioj
+   Params: none
+*/
 SELECT id, name, comment
 FROM environments;
 
 -- :name get-environment :?
--- :doc Retrieves a specific of environment
+/* :doc Retrieves a specific environment
+   Rekuperas specifa medio
+   Params: {:env_name "name"}
+*/
 SELECT name, comment
 FROM environments
 WHERE name = :env_name;
 
--- :name delete-environment! :! :n
--- :doc deletes a user record given the id
-DELETE FROM environments
-WHERE id = :id;
-
 -- :name create-node! :! :n
--- :doc Creates a new node in the environment
+/* :doc Creates a new node in an environment
+   Kreas nuvon nodon en medio
+   Params: {:env_name "name" :name "name" :type "type" :version "version" :deploymentdate "date-time" :comment "comment"}
+*/
 INSERT INTO nodes
 (env_id, name, type, version, deploymentdate, comment)
 VALUES ((SELECT id FROM environments WHERE name = :env_name), :name, :type, :version, :deploymentdate, :comment)
 
--- :name get-all-nodes :?
--- :doc Used to be able to test the get-nodes query
+-- :name get-all-nodes :? :n
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
 SELECT *
 FROM nodes
 
--- :name get-nodes :?
--- :doc Retrieve the nodes as deployed before :date, or the last situation
+-- :name get-nodes :? :n
+/* :doc Retrieve the nodes as deployed before :date, or the last situation
+   Rekuperu la nodojn kiel deplojitajn antaŭe :dato aŭ la lasta situacio
+   Params: {:env_name "name" :date "date-time"} :date is optional - estas nedeviga
+*/
 SELECT name, type, version, deploymentdate AS depdate, comment
 FROM nodes
 WHERE id in (SELECT MAX(id)
@@ -42,7 +55,10 @@ WHERE id in (SELECT MAX(id)
 AND env_id = (SELECT id FROM environments WHERE name = :env_name)
 
 -- :name get-node :?
--- :doc Retrieve a specific node from an environement
+/* :doc Retrieve a specific node from an environement
+   Rekuperas specifa nodon de medio
+   Params: {:env_name "name" :nod_name "name" :nod_version "version"}
+*/
 SELECT name
 FROM nodes
 WHERE env_id = (SELECT id FROM environments WHERE name = :env_name)
@@ -50,7 +66,11 @@ AND name = :nod_name
 AND version = :nod_version
 
 -- :name create-subnode! :! :n
--- :doc Creates a new subnode for a node
+/* :doc Creates a new subnode for a node
+   Kreas nuvon subnodon por nodon
+   Params: {:env_name "name" :nod_name "name" :nod_version "version"
+            :name "name" :version "version" :deploymentdate "date-time" :comment "comment"}
+*/
 INSERT INTO subnodes
 (nod_id, name, version, deploymentdate, comment)
 VALUES ((SELECT id
@@ -61,11 +81,18 @@ VALUES ((SELECT id
         :name, :version, :deploymentdate, :comment)
 
 -- :name get-all-subnodes :?
--- :doc Used to be able to test the get-subnodes query
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
 SELECT *
 FROM subnodes
 
--- :name get-subnodes :?
+-- :name get-subnodes :? :n
+/* :doc Retrieve the subnodes for a specific node
+   Rekuperu la subnodojn por specifa nodo
+   Params: {:nod_name "name" :nod_version "version" :date "date-time"} :date is optional - estas nedeviga
+*/
 SELECT name, version, deploymentdate AS depdate, comment
 FROM subnodes
 WHERE id in (SELECT MAX(id)
@@ -75,7 +102,10 @@ WHERE id in (SELECT MAX(id)
 AND nod_id = (SELECT id FROM nodes WHERE name = :nod_name AND version = :nod_version)
 
 -- :name get-subnode :?
--- :doc Retrieve a specific subnode from an environement
+/* :doc Retrieve a specific subnode from a node in an environment
+   Rekuperu specifan subnodon de nodo en medio
+   Params: {:env_name "name" :nod_name "name" :nod_version "version" :sub_name "name" :sub_version "version"}
+*/
 SELECT name
 FROM subnodes
 WHERE nod_id = (SELECT id
@@ -88,19 +118,28 @@ AND version = :sub_version
 
 
 -- :name create-link! :! :n
--- :doc Creates a new link in the nevironment between existing (sub)nodes
+/* :doc Creates a new link in the environment between existing (sub)nodes
+   Kreas novan ligon en la medio inter ekzistantaj (sub)nodoj
+   Params: {:env_name "name" :name "name" :type "type" :version "version" :deploymentdate "date-time" :comment "comment"}
+*/
 INSERT INTO links
 (env_id, name, type, version, deploymentdate, comment)
 VALUES ((SELECT id FROM environments WHERE name = :env_name),
         :name, :type, :version, :deploymentdate, :comment)
 
 -- :name get-all-links :?
--- :doc Used to be able to test the get-links query
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
 SELECT *
 FROM links
 
 -- :name get-links :?
--- :doc "Retrieve the links from an enviroment"
+/* :doc Retrieve the links from an environment
+   Rekuperas la ligo de medio
+   Params: {:env_name "name" :date "date-time"} :date is optional - estas nedeviga
+*/
 SELECT l.name, l.type, l.version, l.deploymentdate AS depdate, l.comment, FORMATDATETIME(l.timestamp, 'yyyy-MM-dd HH:mm:ss') AS insertdate,
        sn.name AS sourceName, sn.version AS sourceVersion, ssn.name AS sourceSubNode, ssn.version AS sourceSubVersion,
        tn.name AS targetName, tn.version AS targetVersion, tsn.name AS targetSubNode, tsn.version AS targetSubVersion
@@ -128,7 +167,10 @@ WHERE l.id IN (SELECT MAX(id)
 AND l.env_id = (SELECT id FROM environments WHERE name = :env_name)
 
 -- :name create-source! :! :n
--- :doc Adds a new version of a source to a link
+/* :doc Adds a new version of a source to a link
+   Aldonas novan version de fonto al ligilo
+   Params: {:lin_id lin-id :nod-name "name" :nod_version "version" :sub_name "name" :sub_version "version"}
+*/
 INSERT INTO sources
 (lin_id, nod_id, sub_id)
 VALUES (:lin_id,
@@ -136,18 +178,27 @@ VALUES (:lin_id,
         ISNULL(SELECT id FROM subnodes WHERE name = :sub_name AND version = :sub_version,-1))
 
 -- :name get-all-sources :?
--- :doc Used to be able to test the get-sources query
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
 SELECT *
 FROM sources
 
 -- :name get-sources :?
--- :doc "Retrieve source id's"
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
 SELECT lin_id, nod_id, sub_id
 FROM sources
 WHERE lin_id = :lin_id
 
 -- :name create-target! :! :n
--- :doc Adds a new version of a target to a link
+/* :doc Adds a new version of a target to a link
+   Aldonas novan version de celo al ligilo
+   Params: {:lin_id lin-id :nod-name "name" :nod_version "version" :sub_name "name" :sub_version "version"}
+*/
 INSERT INTO targets
 (lin_id, nod_id, sub_id)
 VALUES (:lin_id,
@@ -155,12 +206,18 @@ VALUES (:lin_id,
         ISNULL(SELECT id FROM subnodes WHERE name = :sub_name AND version = :sub_version,-1))
 
 -- :name get-all-targets :?
--- :doc Used to be able to test the get-sources query
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
 SELECT *
 FROM targets
 
 -- :name get-targets :?
--- :doc "Retrieve target id's"
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
 SELECT lin_id, nod_id, sub_id
 FROM targets
 WHERE id = :lin_id)
@@ -168,37 +225,55 @@ WHERE id = :lin_id)
 
 -- Queries which will not be exposed via the API
 -- :name show-tables :?
--- :doc Show all the tables
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
 SHOW TABLES;
 
 -- :name get-environment-id :? :1
--- :doc Gets the ID for a certain environment
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
 SELECT id
 FROM environments
 WHERE name = :env_name
 
 -- :name get-maxId-nodes :? :1
--- :doc Gets the IDs for the nodes
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
 SELECT MAX(id)
 FROM nodes
 GROUP BY name
 
 -- :name get-node-id :? :1
--- :doc Retrieve the id of a specific node
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
 SELECT id
 FROM nodes
 WHERE name = :nod_name
 AND version = :nod_version
 
 -- :name get-subnode-id :? :1
--- :doc Retrieve the id of a specific node
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
 SELECT id
 FROM subnodes
 WHERE name = :sub_name
 AND version = :sub_version
 
 -- :name get-link-id :? :1
--- :doc Retrieve the id of a specific link
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
 SELECT id
 FROM links
 WHERE env_id = (SELECT id FROM environments WHERE name = :env_name)
