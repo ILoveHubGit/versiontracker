@@ -7,7 +7,7 @@
   [links select-view]
   (let [new-links (convert-links links)]
     [:div {:hidden @select-view}
-      [:div (str new-links)]]))
+      [:div {:id "#graph-view"} (str new-links)]]))
 
 (defn add-node
   [node sub?]
