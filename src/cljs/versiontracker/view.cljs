@@ -4,6 +4,7 @@
             [markdown.core :refer [md->html]]
             [reagent.core :as r]
             [re-frame.core :as rf]
+            [versiontracker.about :as vt-abou]
             [versiontracker.validation :as vt-vali]
             [versiontracker.forms.controls :as forms]))
 
@@ -31,9 +32,10 @@
        [nav-link "Home" :home]
        [nav-link "About" :about]]]]))
 
-(defn about-page []
-  [:section.section>div.container>div.content
-   [:img {:src "/img/warning_clojure.png"}]])
+(defn footer []
+  [:footer.myFooter
+   [:div.content.has-text-centered
+     "© 2021 ILoveHubGit: Version Tracker Version: 0.1.0"]])
 
 (defn make-row
   [link]
@@ -120,5 +122,6 @@
    [navbar]
    [kf/switch-route (fn [route] (get-in route [:data :name]))
     :home home-page
-    :about about-page
-    nil [:div ""]]])
+    :about vt-abou/about-page
+    nil [:div ""]]
+   [footer]])

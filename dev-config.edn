@@ -6,4 +6,9 @@
  :port 3000
  ;; when :nrepl-port is set the application starts the nREPL server on load
  :nrepl-port 7000
- :database-url "jdbc:h2:./versiontracker_dev.db"}
+ :database-url
+    {:h2 "jdbc:h2:./versiontracker_dev.db"
+     :h2-queries "sql/queries.sql"
+     :mssql nil
+     :mssql-queries "sql/queries-mssql.sql"}
+ :database-queries "sql/queries.sql"}

@@ -7,9 +7,18 @@
     [versiontracker.config :refer [env]]))
 
 (defstate ^:dynamic *db*
-          :start (conman/connect! {:jdbc-url (env :database-url)})
-          :stop (conman/disconnect! *db*))
+  "This variable has the database connection to the database"
+  :start
+   (let [jdbc-h2    (:h2 (env :database-url))
+         jdbc-mssql (:mssql (env :database-url))]
+     (if (nil? jdbc-mssql)
+       (conman/connect! {:jdbc-url jdbc-h2})
+       (conman/connect! {:jdbc-url jdbc-mssql})))
+  :stop
+   (conman/disconnect! *db*))
 
+; How can I make this line dependent of the database
+; Different set of queries per database type
 (conman/bind-connection *db* "sql/queries.sql")
 
 (extend-protocol next.jdbc.result-set/ReadableColumn

@@ -57,12 +57,7 @@
   (if-not (db-check/exist_env? env-name)
       {:result "Environment must exists before adding a node"}
       (try
-        (db/create-node! {:env_name env-name
-                          :name (:name node)
-                          :type (:type node)
-                          :version (:version node)
-                          :deploymentdate (:deploymentdate node)
-                          :comment (:comment node)})
+        (db/create-node! (merge {:env_name env-name} node))
         (catch Exception e
                (log/error (str "Error inserting to db: " e))
                {:result (str "Error inserting to db: " e)}))))
@@ -102,13 +97,10 @@
                (db-check/exist_node? env-name nod-name nod-version))
     {:result "Either Environment or Node does not exist"}
     (let [sub-in (try
-                   (db/create-subnode! {:env_name env-name
-                                        :nod_name nod-name
-                                        :nod_version nod-version
-                                        :name (:name subnode)
-                                        :version (:version subnode)
-                                        :deploymentdate (:deploymentdate subnode)
-                                        :comment (:comment subnode)})
+                   (db/create-subnode! (merge {:env_name env-name
+                                               :nod_name nod-name
+                                               :nod_version nod-version}
+                                              subnode))
                    (catch Exception e
                           (log/error (str "Error inserting to db: " e))
                           {:result (str "Error inserting to db: " e)}))]
@@ -220,36 +212,44 @@
   "Adds new source to a link in the environment
 
    Aldonas novan fonto al ligo en la medio"
-  [env-name link-name link-version source]
+  [env-name link-name link-version {:keys [Node Version SubNode SubVersion]}]
   (if-not (db-check/exist_env? env-name)
     {:result "Cannot find the environment for requested link"}
-    (let [lin-id (:id (db/get-link-id {:env_name env-name
-                                       :name link-name
-                                       :version link-version}))
-          sou-in (if (nil? lin-id)
-                  nil
-                  (db/create-source! {:lin_id lin-id
-                                      :nod_name (:Node source) :nod_version (:Version source)
-                                      :sub_name (:SubNode source) :sub_version (:SubVersion source)}))]
+    (let [lin-id    (:id (db/get-link-id {:env_name env-name
+                                          :name link-name
+                                          :version link-version}))
+          node?     (db-check/exist_node? env-name Node Version)
+          subnode?  (if SubNode
+                      (db-check/exist_subnode? env-name Node Version SubNode SubVersion)
+                      true)
+          sou-in    (if (and (not (nil? lin-id)) node? subnode?)
+                     (db/create-source! {:lin_id lin-id
+                                         :nod_name Node :nod_version Version
+                                         :sub_name SubNode :sub_version SubVersion})
+                     nil)]
       (if (nil? sou-in)
-        {:result "Source could not be added because the link does not exist"}
+        {:result "Source-node could not be added; check if the link and node do exist"}
         {:result "Source succesfully added to the link"}))))
 
 (defn add-target!
   "Adds new target to a link in the environment
 
    Aldonas novan celo al ligo en la medio"
-  [env-name link-name link-version target]
+  [env-name link-name link-version {:keys [Node Version SubNode SubVersion]}]
   (if-not (db-check/exist_env? env-name)
     {:result "Cannot find the environment for requested link"}
-    (let [lin-id (:id (db/get-link-id {:env_name env-name
-                                       :name link-name
-                                       :version link-version}))
-          tar-in (if (nil? lin-id)
-                   nil
-                   (db/create-target! {:lin_id lin-id
-                                       :nod_name (:Node target) :nod_version (:Version target)
-                                       :sub_name (:SubNode target) :sub_version (:SubVersion target)}))]
+    (let [lin-id    (:id (db/get-link-id {:env_name env-name
+                                          :name link-name
+                                          :version link-version}))
+          node?     (db-check/exist_node? env-name Node Version)
+          subnode?  (if SubNode
+                      (db-check/exist_subnode? env-name Node Version SubNode SubVersion)
+                      true)
+          tar-in    (if (and (not (nil? lin-id)) node? subnode?)
+                      (db/create-target! {:lin_id lin-id
+                                          :nod_name Node :nod_version Version
+                                          :sub_name SubNode :sub_version SubVersion})
+                      nil)]
       (if (nil? tar-in)
-        {:result "Target could not be added because the link does not exist"}
+        {:result "Target-node could not be added; check if the link and node do exist"}
         {:result "Target succesfully added to the link"}))))

@@ -19,11 +19,11 @@
 
   Liveras 'true' kiam la medio, la nodo kun la nodo versio ekzistas en la datumbazo"
   [env-name nod-name nod-version]
-  (if (= 1 (count (db/get-node {:env_name env-name
-                                :nod_name nod-name
-                                :nod_version nod-version})))
-    true
-    false))
+  (let [nodes (count (db/get-node {:env_name env-name
+                                   :nod_name nod-name
+                                   :nod_version nod-version}))]
+    (= 1 nodes)))
+
 
 (defn exist_subnode?
   "Returns 'true' when requested with subnode name is 'nil' or when the environment,
@@ -32,12 +32,12 @@
   Liveras 'true' kiam petite kun la nomo de subnodo estas 'nil' aŭ kiam la medio,
    nodo kun versio kaj subnodo kun versio ekzistas en la datumbazo"
   [env-name nod-name nod-version sub-name sub-version]
-  (if (nil? sub-name)
-    true
-    (if (= 1 (count (db/get-subnode {:env_name env-name
-                                     :nod_name nod-name
-                                     :nod_version nod-version
-                                     :sub_name sub-name
-                                     :sub_version sub-version})))
-      true
-      false)))
+  (let [subnodes
+        (if (nil? sub-name)
+          1
+          (count (db/get-subnode {:env_name env-name
+                                  :nod_name nod-name
+                                  :nod_version nod-version
+                                  :sub_name sub-name
+                                  :sub_version sub-version})))]
+    (= 1 subnodes)))

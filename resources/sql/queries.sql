@@ -33,7 +33,7 @@ INSERT INTO nodes
 (env_id, name, type, version, deploymentdate, comment)
 VALUES ((SELECT id FROM environments WHERE name = :env_name), :name, :type, :version, :deploymentdate, :comment)
 
--- :name get-all-nodes :? :n
+-- :name get-all-nodes :?
 /* :doc For developers only
    Nur por programistoj
    Params: none
@@ -41,7 +41,7 @@ VALUES ((SELECT id FROM environments WHERE name = :env_name), :name, :type, :ver
 SELECT *
 FROM nodes
 
--- :name get-nodes :? :n
+-- :name get-nodes :?
 /* :doc Retrieve the nodes as deployed before :date, or the last situation
    Rekuperu la nodojn kiel deplojitajn antaŭe :dato aŭ la lasta situacio
    Params: {:env_name "name" :date "date-time"} :date is optional - estas nedeviga
@@ -88,7 +88,7 @@ VALUES ((SELECT id
 SELECT *
 FROM subnodes
 
--- :name get-subnodes :? :n
+-- :name get-subnodes :?
 /* :doc Retrieve the subnodes for a specific node
    Rekuperu la subnodojn por specifa nodo
    Params: {:nod_name "name" :nod_version "version" :date "date-time"} :date is optional - estas nedeviga
