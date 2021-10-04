@@ -21,19 +21,20 @@
                              :opt-un [::comment]))
 (s/def ::environments (s/coll-of ::environment))
 
-(s/def ::subnode (s/keys :req-un [::name ::version ::deploymentdate]
-                         :opt-un [::comment]))
+(s/def ::subnode (s/keys :req-un [::name ::version]
+                         :opt-un [::deploymentdate ::comment]))
 (s/def ::subnodes (s/coll-of ::subnode))
 
-(s/def ::node (s/keys :req-un [::name ::type ::version ::deploymentdate]
-                      :opt-un [::comment]))
+(s/def ::node (s/keys :req-un [::name ::version]
+                      :opt-un [::type ::deploymentdate ::comment]))
 (s/def ::nodes (s/coll-of ::node))
 
-(s/def ::source (s/keys :opt-un [::Node ::Version ::SubNode ::SubVersion]))
-(s/def ::target (s/keys :opt-un [::Node ::Version ::SubNode ::SubVersion]))
+(s/def ::source (s/keys :req-un [::Node ::Version]
+                        :opt-un [::SubNode ::SubVersion]))
+(s/def ::target ::source)
 
-(s/def ::link (s/keys :req-un [::name ::type ::version ::deploymentdate]
-                      :opt-un [::comment
+(s/def ::link (s/keys :req-un [::name ::type ::version]
+                      :opt-un [::deploymentdate ::comment
                                ::source
                                ::target]))
 (s/def ::links (s/coll-of ::link))
