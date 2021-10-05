@@ -28,9 +28,23 @@
                               {})))))
     (is (= {:name "TestEnvironment"
             :comment "No comment"}
-           (dissoc (db/get-environment t-conn {:env_name "TestEnvironment"} {}) :id)))))
+           (db/get-environment t-conn {:env_name "TestEnvironment"} {})))))
 
 (deftest test-get-environments
   (jdbc/with-transaction [t-conn *db*]
     (is (s/valid? ::vt-vali/environments
                   (db/get-environments t-conn {} {})))))
+
+(deftest test-add-link
+  (jdbc/with-transaction [t-conn *db* {:rollback-only true}]
+    (let [link-id (:id (first (db/create-link!
+                                t-conn
+                                {:env_id 1
+                                 :name "TestLink"
+                                 :type "API"
+                                 :version "1.0"
+                                 :deploymentdate "2021-10-04T23:36:00"
+                                 :comment "No comment"}
+                                {})))]
+      (is (number? link-id))
+      (is (= {:id link-id} (db/get-link-id t-conn {:name "TestLink" :version "1.0"}))))))

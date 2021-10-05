@@ -45,7 +45,7 @@
   (if (nil? env-name)
     {:result "You need to specify the environment name"}
     (try
-      (first (db/get-environment {:env_name env-name}))
+      (db/get-environment {:env_name env-name})
       (catch Exception e
              (log/error (str "Error getting from db: " e))
              {:result (str "Error getting from db: " e)}))))
@@ -179,14 +179,10 @@
       (let [lin-id (add-interface! (merge {:env_id env-id} link))
             source (:source link)
             sou-in (when-not (nil? source)
-                     (add-source! {:lin_id lin-id
-                                   :nod_name (:Node source) :nod_version (:Version source)
-                                   :sub_name (:SubNode source) :sub_version (:SubVersion source)}))
+                     (add-source! env-id lin-id source))
             target (:target link)
             tar-in (when-not (nil? target)
-                     (add-target! {:lin_id lin-id
-                                   :nod_name (:Node target) :nod_version (:Version target)
-                                   :sub_name (:SubNode target) :sub_version (:SubVersion target)}))]
+                     (add-target! env-id lin-id target))]
        {:result "The link was succesfully added"}))))
 
 
@@ -216,9 +212,19 @@
 
    Rekuperas liston de ligoj el medio"
   [env-name date]
-  (let [env-id (db-check/exist_env env-name)]
-    (let [base {:env_id env-id}
-          params (if-not (nil? date)
-                   (assoc base :date date)
-                   base)]
-      (map #(prepare-links %) (db/get-links params)))))
+  (let [env-id (db-check/exist_env env-name)
+        base {:env_id env-id}
+        params (if-not (nil? date)
+                 (assoc base :date date)
+                 base)]
+    (map #(prepare-links %) (db/get-links params))))
+
+(defn add-node-to-link!
+  [side env-name link-name link-version link]
+  (let [env-id (db-check/exist_env env-name)
+        lin-id (db-check/exist_link env-id link-name link-version)]
+    (if (nil? lin-id)
+      {:result "Please add the link first"}
+      (case side
+            :source (add-source! env-id lin-id link)
+            :target (add-target! env-id lin-id link)))))

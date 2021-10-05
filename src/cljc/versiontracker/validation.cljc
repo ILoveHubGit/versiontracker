@@ -3,7 +3,7 @@
 
 (s/def ::name string?)
 (s/def ::comment (s/nilable string?))
-(s/def ::type string?)
+(s/def ::type (s/nilable string?))
 (s/def ::version string?)
 (s/def ::deploymentdate string?)
 ; (s/def ::deploymentdate instance?)
