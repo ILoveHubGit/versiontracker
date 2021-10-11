@@ -18,17 +18,13 @@
    Aldonas novan medion al datumbazo
    env - Devus esti mapo kun :name (bezonata) kaj :comment (nedeviga)"
   [env]
-  (if (nil? (:name env))
-    (do
-      (log/info (str "Environment name is missing, can't add environment"))
-      {:result "Can't add an empty environment"})
-    (try
-      (let [env-id (:id (first (db/create-environment! {:name (:name env) :comment (:comment env)})))]
-        (log/info (str "Environment with name: " (:name env) " create with ID: " env-id))
-        env-id)
-      (catch Exception e
-             (log/error (str "Error inserting to db: " e))
-             {:result (str "Error inserting to db: " e)}))))
+  (try
+    (let [env-id (:id (first (db/create-environment! env)))]
+      (log/info (str "Environment with name: " (:name env) " create with ID: " env-id))
+      env-id)
+    (catch Exception e
+           (log/error (str "Error inserting to db " e))
+           {:result (str "Error inserting to db " e)})))
 
 (defn ret-environments
   "Retrieves the list of environments
@@ -67,18 +63,6 @@
                  (log/error (str "Error inserting to db: " e))
                  {:result (str "Error inserting to db: " e)})))))
 
-(defn prepare-nodes
-  "Convert the db result to the correct map
-
-   Konvertu la db-rezulton al la ĝusta mapo"
-  [node]
-  {:name (:name node)
-   :type (:type node)
-   :version (:version node)
-   :deploymentdate (str (:depdate node))
-   :comment (:comment node)})
-
-
 (defn ret-nodes
   "Retrieves a list of nodes from an environment
 
@@ -91,7 +75,7 @@
             params (if-not (nil? date)
                      (assoc base :date date)
                      base)]
-        (mapv #(prepare-nodes %) (db/get-nodes params))))))
+        (db/get-nodes params)))))
 
 ;; SubNodes
 (defn add-subnode!
@@ -133,7 +117,7 @@
   Aldonas novan interfacon al medio, se ĝi ankoraŭ ne ekzistas kaj redonas sian identigilon"
   [{:keys [env-id name version type deploymentdate comment]}]
   (try
-       (:id (first (db/create-link!)))
+       (:id (first (db/create-link! {:env_id env-id :name name :version version :type type :deploymentdate deploymentdate :comment comment})))
        (catch Exception e
               (log/error (str "Error inserting link to db: " e))
               {:result (str "Error inserting link to db: " e)})))
@@ -176,7 +160,7 @@
   (let [env-id (db-check/exist_env env-name)]
     (if (nil? env-id)
       {:result "Empty parameters are not allowed"}
-      (let [lin-id (add-interface! (merge {:env_id env-id} link))
+      (let [lin-id (:id (first (add-interface! (merge {:env-id env-id} link))))
             source (:source link)
             sou-in (when-not (nil? source)
                      (add-source! env-id lin-id source))
@@ -194,7 +178,7 @@
   {:name (:name link)
    :type (:type link)
    :version (:version link)
-   :deploymentdate (str (:depdate link))
+   :deploymentdate (:deploymentdate link)
    :comment (:comment link)
    :insertdate (:insertdate link)
    :source {:Node (:sourcename link)

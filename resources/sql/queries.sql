@@ -48,7 +48,7 @@ FROM nodes
    Rekuperu la nodojn kiel deplojitajn antaŭe :dato aŭ la lasta situacio
    Params: {:env_id id :date "date-time"} :date is optional - estas nedeviga
 */
-SELECT name, type, version, deploymentdate AS depdate, comment
+SELECT name, type, version, FORMATDATETIME(deploymentdate, 'yyyy-MM-dd HH:mm:ss') AS deploymentdate, comment
 FROM nodes
 WHERE id in (SELECT MAX(id)
               FROM nodes
@@ -89,7 +89,7 @@ FROM subnodes
    Rekuperu la subnodojn por specifa nodo
    Params: {:nod_name "name" :nod_version "version" :date "date-time"} :date is optional - estas nedeviga
 */
-SELECT name, version, deploymentdate AS depdate, comment
+SELECT name, version, FORMATDATETIME(deploymentdate, 'yyyy-MM-dd HH:mm:ss') AS deploymentdate, comment
 FROM subnodes
 WHERE id in (SELECT MAX(id)
                FROM subnodes
@@ -131,7 +131,7 @@ FROM links
    Rekuperas la ligo de medio
    Params: {:env_id ID :date "date-time"} :date is optional - estas nedeviga
 */
-SELECT l.name, l.type, l.version, l.deploymentdate AS depdate, l.comment, FORMATDATETIME(l.timestamp, 'yyyy-MM-dd HH:mm:ss') AS insertdate,
+SELECT l.name, l.type, l.version, FORMATDATETIME(l.deploymentdate, 'yyyy-MM-dd HH:mm:ss') AS deploymentdate, l.comment, FORMATDATETIME(l.timestamp, 'yyyy-MM-dd HH:mm:ss') AS insertdate,
        sn.name AS sourceName, sn.version AS sourceVersion, ssn.name AS sourceSubNode, ssn.version AS sourceSubVersion,
        tn.name AS targetName, tn.version AS targetVersion, tsn.name AS targetSubNode, tsn.version AS targetSubVersion
 FROM links as l
