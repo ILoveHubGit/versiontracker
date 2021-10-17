@@ -13,6 +13,7 @@
 
 (conman/bind-connection *db* "sql/queries.sql")
 
+
 (extend-protocol next.jdbc.result-set/ReadableColumn
   java.sql.Timestamp
   (read-column-by-label [^java.sql.Timestamp v _]

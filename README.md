@@ -27,9 +27,10 @@ If you run this application for the first time you need to run this command befo
     java -jar versiontracker.jar migrate
 
 ## Releases
-### Version 0.2.0
+### Version 0.1.2
 
-- Added Graph View
+- Prepared Graph View
+- Added support for MS-SQL database
 
 ### Version 0.1.0
 

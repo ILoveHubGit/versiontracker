@@ -34,18 +34,18 @@
     (testing "success-get-environments"
       (let [response ((app) (-> (request :get "/api/environments")))]
         (is (= 200 (:status response)))
-        (is (s/valid? ::vt-vali/environments (m/decode-response-body response)))))
+        (is (s/valid? ::vt-vali/environments (m/decode-response-body response)))))))
 
-    (testing "success-post-environment"
-      (let [response ((app) (-> (request :post "/api/environments")
-                                (json-body {:name "TestEnvironment" :comment "No comment"})))]
-        (is (= 200 (:status response)))
-        (is (= "TestEnvironment is added" (:result (m/decode-response-body response))))))
-
-    (testing "success-get-environment"
-      (let [response ((app) (-> (request :get "/api/environments/TestEnvironment")))]
-        (is (= 200 (:status response)))
-        (is (s/valid? ::vt-vali/environment (m/decode-response-body response)))))))
+    ; (testing "success-post-environment"
+    ;   (let [response ((app) (-> (request :post "/api/environments")
+    ;                             (json-body {:name "TestEnvironment" :comment "No comment"})))]
+    ;     (is (= 200 (:status response)))
+    ;     (is (= "TestEnvironment is added" (:result (m/decode-response-body response))))))
+    ;
+    ; (testing "success-get-environment"
+    ;   (let [response ((app) (-> (request :get "/api/environments/TestEnvironment")))]
+    ;     (is (= 200 (:status response)))
+    ;     (is (s/valid? ::vt-vali/environment (m/decode-response-body response)))))))
 
     ; (testing "success-get-nodes"
     ;   (let [response ((app) (-> (request :get "/api/environments/myTest/nodes")))]

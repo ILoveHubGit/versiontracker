@@ -46,9 +46,17 @@ FROM nodes
 -- :name get-nodes :?
 /* :doc Retrieve the nodes as deployed before :date, or the last situation
    Rekuperu la nodojn kiel deplojitajn antaŭe :dato aŭ la lasta situacio
-   Params: {:env_id id :date "date-time"} :date is optional - estas nedeviga
+   Params: {:db-type type :env_id id :date "date-time"} :date is optional - estas nedeviga
 */
-SELECT name, type, version, FORMATDATETIME(deploymentdate, 'yyyy-MM-dd HH:mm:ss') AS deploymentdate, comment
+SELECT name
+      , type
+      , version
+      /*~
+      (case (:db-type params)
+            :h2 ", FORMATDATETIME(deploymentdate, 'yyyy-MM-dd HH:mm:ss') AS deploymentdate"
+            :sqlserver ", CONVERT(VARCHAR(25), deploymentdate, 120) AS deploymentdate")
+      ~*/
+      , comment
 FROM nodes
 WHERE id in (SELECT MAX(id)
               FROM nodes
@@ -70,11 +78,11 @@ AND version = :nod_version
 -- :name create-subnode! :i! :raw
 /* :doc Creates a new subnode for a node
    Kreas nuvon subnodon por nodon
-   Params: {:nod-id ID, :name "name" :version "version" :deploymentdate "date-time" :comment "comment"}
+   Params: {:nod_id ID, :name "name" :version "version" :deploymentdate "date-time" :comment "comment"}
 */
 INSERT INTO subnodes
 (nod_id, name, version, deploymentdate, comment)
-VALUES :nod_id, :name, :version, :deploymentdate, :comment)
+VALUES (:nod_id, :name, :version, :deploymentdate, :comment)
 
 -- :name get-all-subnodes :?
 /* :doc For developers only
@@ -87,9 +95,16 @@ FROM subnodes
 -- :name get-subnodes :?
 /* :doc Retrieve the subnodes for a specific node
    Rekuperu la subnodojn por specifa nodo
-   Params: {:nod_name "name" :nod_version "version" :date "date-time"} :date is optional - estas nedeviga
+   Params: {:db-type type :nod_name "name" :nod_version "version" :date "date-time"} :date is optional - estas nedeviga
 */
-SELECT name, version, FORMATDATETIME(deploymentdate, 'yyyy-MM-dd HH:mm:ss') AS deploymentdate, comment
+SELECT name
+      , version
+      /*~
+      (case (:db-type params)
+            :h2 ", FORMATDATETIME(deploymentdate, 'yyyy-MM-dd HH:mm:ss') AS deploymentdate"
+            :sqlserver ", CONVERT(VARCHAR(25), deploymentdate, 120) AS deploymentdate")
+      ~*/
+      , comment
 FROM subnodes
 WHERE id in (SELECT MAX(id)
                FROM subnodes
@@ -129,10 +144,23 @@ FROM links
 -- :name get-links :?
 /* :doc Retrieve the links from an environment
    Rekuperas la ligo de medio
-   Params: {:env_id ID :date "date-time"} :date is optional - estas nedeviga
+   Params: {:db-type type :env_id ID :date "date-time"} :date is optional - estas nedeviga
 */
-SELECT l.name, l.type, l.version, FORMATDATETIME(l.deploymentdate, 'yyyy-MM-dd HH:mm:ss') AS deploymentdate, l.comment, FORMATDATETIME(l.timestamp, 'yyyy-MM-dd HH:mm:ss') AS insertdate,
-       sn.name AS sourceName, sn.version AS sourceVersion, ssn.name AS sourceSubNode, ssn.version AS sourceSubVersion,
+SELECT l.name
+      , l.type
+      , l.version
+      /*~
+      (case (:db-type params)
+            :h2 ", FORMATDATETIME(l.deploymentdate, 'yyyy-MM-dd HH:mm:ss') AS deploymentdate"
+            :sqlserver ", CONVERT(VARCHAR(25), l.deploymentdate, 120) AS deploymentdate")
+      ~*/
+      , l.comment
+      /*~
+      (case (:db-type params)
+            :h2 ", FORMATDATETIME(l.timestamp, 'yyyy-MM-dd HH:mm:ss') AS insertdate"
+            :sqlserver ", CONVERT(VARCHAR(25), l.timestamp, 120) AS insertdate")
+      ~*/
+      , sn.name AS sourceName, sn.version AS sourceVersion, ssn.name AS sourceSubNode, ssn.version AS sourceSubVersion,
        tn.name AS targetName, tn.version AS targetVersion, tsn.name AS targetSubNode, tsn.version AS targetSubVersion
 FROM links as l
 LEFT OUTER JOIN sources AS s ON l.id = s.lin_id
@@ -160,13 +188,12 @@ AND l.env_id = :env_id
 -- :name create-source! :i! :raw
 /* :doc Adds a new version of a source to a link
    Aldonas novan version de fonto al ligilo
-   Params: {:lin_id lin-id :nod-name "name" :nod_version "version" :sub_name "name" :sub_version "version"}
+   Params: {:lin_id lin-id :nod_id nod_id :sub_id sub-id}
 */
 INSERT INTO sources
 (lin_id, nod_id, sub_id)
-VALUES (:lin_id,
-        ISNULL(SELECT id FROM nodes WHERE name = :nod_name AND version = :nod_version,-1),
-        ISNULL(SELECT id FROM subnodes WHERE name = :sub_name AND version = :sub_version,-1))
+VALUES
+(:lin_id, :nod_id, :sub_id)
 
 -- :name get-all-sources :?
 /* :doc For developers only
@@ -188,13 +215,12 @@ WHERE lin_id = :lin_id
 -- :name create-target! :i! :raw
 /* :doc Adds a new version of a target to a link
    Aldonas novan version de celo al ligilo
-   Params: {:lin_id lin-id :nod-name "name" :nod_version "version" :sub_name "name" :sub_version "version"}
+   Params: {:lin_id lin-id :nod_id nod_id :sub_id sub-id}
 */
 INSERT INTO targets
 (lin_id, nod_id, sub_id)
-VALUES (:lin_id,
-        ISNULL(SELECT id FROM nodes WHERE name = :nod_name AND version = :nod_version,-1),
-        ISNULL(SELECT id FROM subnodes WHERE name = :sub_name AND version = :sub_version,-1))
+VALUES
+(:lin_id, :nod_id, :sub_id)
 
 -- :name get-all-targets :?
 /* :doc For developers only
@@ -211,42 +237,27 @@ FROM targets
 */
 SELECT lin_id, nod_id, sub_id
 FROM targets
-WHERE id = :lin_id)
+WHERE id = :lin_id
 
 
 -- Above queries exposed via the API
 
 
 -- Below queries which will not be exposed via the API
--- :name show-tables :?
-/* :doc For developers only
-   Nur por programistoj
-   Params: none
-*/
-SHOW TABLES;
 
 -- :name get-environment-id :? :1
 /* :doc For developers only
    Nur por programistoj
-   Params: none
+   Params: {:env_name "name"}
 */
 SELECT id
 FROM environments
 WHERE name = :env_name
 
--- :name get-maxId-nodes :? :1
-/* :doc For developers only
-   Nur por programistoj
-   Params: none
-*/
-SELECT MAX(id)
-FROM nodes
-GROUP BY name
-
 -- :name get-node-id :? :1
 /* :doc For developers only
    Nur por programistoj
-   Params: none
+   Params: {:env_id id :name "name" :version "version"}
 */
 SELECT id
 FROM nodes
@@ -257,7 +268,7 @@ AND version = :version
 -- :name get-subnode-id :? :1
 /* :doc For developers only
    Nur por programistoj
-   Params: none
+   Params: {:nod_id id :name "name" :version "version"}
 */
 SELECT id
 FROM subnodes
@@ -268,10 +279,41 @@ AND version = :version
 -- :name get-link-id :? :1
 /* :doc For developers only
    Nur por programistoj
-   Params: none
+   Params: {:env_id id :name "name" :version "version"}
 */
 SELECT id
 FROM links
-WHERE env_id = env_id
+WHERE env_id = :env_id
 AND name = :name
 AND version = :version
+
+-- :name get-active-nodes :?
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:env_id id :name "name"}
+*/
+SELECT id
+  FROM nodes
+WhERE env_id = :env_id
+AND name = :name
+AND activetill is null
+
+-- :name get-active-sources-for-node :?
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:nod_id (ids)}
+*/
+SELECT lin_id, nod_id, sub_id, 'sources' AS side
+FROM sources
+WHERE nod_id IN (:v*:nod_ids)
+AND activetill is null
+
+-- :name get-active-targets-for-node :?
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:nod_id (ids)}
+*/
+SELECT lin_id, nod_id, sub_id, 'targets' AS side
+FROM targets
+WHERE nod_id IN (:v*:nod_ids)
+AND activetill is null

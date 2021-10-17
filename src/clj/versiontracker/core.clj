@@ -26,7 +26,7 @@
   :start
   (http/start
     (-> env
-        (update :io-threads #(or % (* 2 (.availableProcessors (Runtime/getRuntime))))) 
+        (update :io-threads #(or % (* 2 (.availableProcessors (Runtime/getRuntime)))))
         (assoc  :handler (handler/app))
         (update :port #(or (-> env :options :port) %))
         (select-keys [:handler :host :port])))
@@ -67,12 +67,11 @@
       (System/exit 1))
     (some #{"init"} args)
     (do
-      (migrations/init (select-keys env [:database-url :init-script]))
+      (migrations/init (select-keys env [:database-url :init-script :migration-dir]))
       (System/exit 0))
     (migrations/migration? args)
     (do
-      (migrations/migrate args (select-keys env [:database-url]))
+      (migrations/migrate args (select-keys env [:database-url :migration-dir]))
       (System/exit 0))
     :else
     (start-app args)))
-  

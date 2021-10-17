@@ -23,3 +23,4 @@ shadow-cljs.edn.backup
 *.db.mv.*
 *.db.trace.*
 vt-config.edn
+/sqljdbc_6.0

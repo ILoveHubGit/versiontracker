@@ -30,10 +30,29 @@
             :comment "No comment"}
            (db/get-environment t-conn {:env_name "TestEnvironment"} {})))))
 
-(deftest test-get-environments
-  (jdbc/with-transaction [t-conn *db*]
-    (is (s/valid? ::vt-vali/environments
-                  (db/get-environments t-conn {} {})))))
+; (deftest test-get-environments
+;   (jdbc/with-transaction [t-conn *db*]
+;     (is (s/valid? ::vt-vali/environments
+;                   (db/get-environments t-conn {} {})))))
+
+(deftest test-add-node
+  (jdbc/with-transaction [t-conn *db* {:rollback-only true}]
+    (let [env-id (:id (first (db/create-environment!
+                              t-conn
+                              {:name "TestEnvironment"
+                               :comment "No comment"}
+                              {})))]
+      (is (number? (:id (first (db/create-node!
+                                t-conn
+                                {:env_id env-id
+                                 :name "TestNode"
+                                 :type "Application"
+                                 :version "Test1"
+                                 :deploymentdate "2021-10-12 19:49:00"
+                                 :comment "No comment"}
+                                {})))))
+      (is (s/valid? ::vt-vali/nodes
+             (db/get-nodes t-conn {:env_id env-id} {}))))))
 
 (deftest test-add-link
   (jdbc/with-transaction [t-conn *db* {:rollback-only true}]
