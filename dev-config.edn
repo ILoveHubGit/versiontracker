@@ -8,7 +8,7 @@
  :nrepl-port 7000
  ;; For an H2 Database enable next two lines
  ; :database-url "jdbc:h2:./versiontracker_dev.db"
- ; :migration-dir "resources/migrations/h2/"
+ ; :migration-dir "migrations/h2"
  ;; For an MS-SQL Database enable next two lines and update :database-url for your settings
- :database-url "jdbc:sqlserver://192.168.68.124;databaseName=VersionTracker;user=jeroen;password=versiontracker"
- :migration-dir "resources/migrations/mssql/"}
+ :database-url "jdbc:sqlserver://192.168.68.124;databaseName=VersionTracker_dev;user=jeroen;password=versiontracker"
+ :migration-dir "migrations/mssql"}
