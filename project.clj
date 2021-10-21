@@ -1,4 +1,4 @@
-(defproject versiontracker "0.1.0-SNAPSHOT"
+(defproject versiontracker "0.1.2"
 
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
@@ -14,6 +14,7 @@
                  [com.cognitect/transit-clj "1.0.324"]
                  [com.cognitect/transit-cljs "0.8.269"]
                  [com.h2database/h2 "1.4.200"]
+                 [com.microsoft.sqlserver/sqljdbc4 "4.0"]
                  [conman "0.9.1"]
                  [cprop "0.1.18"]
                  [day8.re-frame/http-fx "0.2.3"]
@@ -31,6 +32,7 @@
                  [metosin/reitit "0.5.13"]
                  [metosin/ring-http-response "0.9.2"]
                  [mount "0.1.16"]
+                 [mysql/mysql-connector-java "8.0.20"]
                  [nrepl "0.8.3"]
                  [org.clojure/clojure "1.10.3"]
                  [org.clojure/clojurescript "1.10.879" :scope "provided"]

@@ -35,7 +35,7 @@
 (defn footer []
   [:footer.myFooter
    [:div.content.has-text-centered
-     "© 2021 ILoveHubGit Version: 0.1.0"]])
+     "© 2021 ILoveHubGit: Version Tracker Version: 0.1.2"]])
 
 (defn about-page []
   [:section.section>div.container>div.content

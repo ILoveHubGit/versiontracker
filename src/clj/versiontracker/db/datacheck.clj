@@ -5,39 +5,37 @@
             [clojure.data.json :as json]
             [clojure.tools.logging :as log]))
 
-(defn exist_env?
-  "Returns 'true' when the environment exists in the database
+(defn exist_env
+  "Returns ID when the environment exists in the database otherwise 'nil'
 
-  Liveras 'true' kiam la medio ekzistas en la datumbazo"
-  [env-name]
-  (if (= 1 (count (db/get-environment {:env_name env-name})))
-    true
-    false))
+  Liveras ID kiam la medio ekzistas en la datumbazo alie 'nil'"
+  [name]
+  (:id (db/get-environment-id {:env_name name})))
 
-(defn exist_node?
-  "Returns 'true' when the environment, node with node version combination exists in the database
+(defn exist_node
+  "Returns ID when the environment, node with node version combination exists in the database otherwies 'nil'
 
-  Liveras 'true' kiam la medio, la nodo kun la nodo versio ekzistas en la datumbazo"
-  [env-name nod-name nod-version]
-  (if (= 1 (count (db/get-node {:env_name env-name
-                                :nod_name nod-name
-                                :nod_version nod-version})))
-    true
-    false))
+  Liveras ID kiam la medio, la nodo kun la nodo versio ekzistas en la datumbazo alie 'nil'"
+  [env-id name version]
+  (:id (db/get-node-id {:env_id env-id
+                        :name name
+                        :version version})))
 
-(defn exist_subnode?
-  "Returns 'true' when requested with subnode name is 'nil' or when the environment,
-  node with version and subnode with version exists in the database
 
-  Liveras 'true' kiam petite kun la nomo de subnodo estas 'nil' aŭ kiam la medio,
-   nodo kun versio kaj subnodo kun versio ekzistas en la datumbazo"
-  [env-name nod-name nod-version sub-name sub-version]
-  (if (nil? sub-name)
-    true
-    (if (= 1 (count (db/get-subnode {:env_name env-name
-                                     :nod_name nod-name
-                                     :nod_version nod-version
-                                     :sub_name sub-name
-                                     :sub_version sub-version})))
-      true
-      false)))
+(defn exist_subnode
+  "Returns ID when the subnode with version exists in the database for a certain node otherwise 'nil'
+
+  Liveras ID kiam la subnodo kun versio ekzistas en la datumbazo por certa nodo alie 'nil'"
+  [nod-id name version]
+  (:id (db/get-subnode-id {:nod_id nod-id
+                           :name name
+                           :version version})))
+
+(defn exist_link
+  "Returns ID when the link with version exists in the database otherwise 'nil'
+
+  Liveras ID kiam la ligo kun versio ekzistas en la datumbazo alie 'nil'"
+  [env-id name version]
+  (:id (db/get-link-id {:env_id env-id
+                        :name name
+                        :version version})))

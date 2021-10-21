@@ -7,10 +7,12 @@
     [versiontracker.config :refer [env]]))
 
 (defstate ^:dynamic *db*
+  "This variable has the database connection to the database"
           :start (conman/connect! {:jdbc-url (env :database-url)})
-          :stop (conman/disconnect! *db*))
+  :stop  (conman/disconnect! *db*))
 
 (conman/bind-connection *db* "sql/queries.sql")
+
 
 (extend-protocol next.jdbc.result-set/ReadableColumn
   java.sql.Timestamp

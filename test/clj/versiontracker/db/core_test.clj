@@ -6,7 +6,9 @@
    [clojure.test :refer :all]
    [next.jdbc :as jdbc]
    [versiontracker.config :refer [env]]
-   [mount.core :as mount]))
+   [versiontracker.validation :as vt-vali]
+   [mount.core :as mount]
+   [clojure.spec.alpha :as s]))
 
 (use-fixtures
   :once
@@ -17,22 +19,51 @@
     (migrations/migrate ["migrate"] (select-keys env [:database-url]))
     (f)))
 
-(deftest test-users
+(deftest test-add-environment
   (jdbc/with-transaction [t-conn *db* {:rollback-only true}]
-    (is (= 1 (db/create-user!
+    (is (number? (:id (first (db/create-environment!
               t-conn
-              {:id         "1"
-               :first_name "Sam"
-               :last_name  "Smith"
-               :email      "sam.smith@example.com"
-               :pass       "pass"}
-              {})))
-    (is (= {:id         "1"
-            :first_name "Sam"
-            :last_name  "Smith"
-            :email      "sam.smith@example.com"
-            :pass       "pass"
-            :admin      nil
-            :last_login nil
-            :is_active  nil}
-           (db/get-user t-conn {:id "1"} {})))))
+                              {:name "TestEnvironment"
+                               :comment "No comment"}
+                              {})))))
+    (is (= {:name "TestEnvironment"
+            :comment "No comment"}
+           (db/get-environment t-conn {:env_name "TestEnvironment"} {})))))
+
+; (deftest test-get-environments
+;   (jdbc/with-transaction [t-conn *db*]
+;     (is (s/valid? ::vt-vali/environments
+;                   (db/get-environments t-conn {} {})))))
+
+(deftest test-add-node
+  (jdbc/with-transaction [t-conn *db* {:rollback-only true}]
+    (let [env-id (:id (first (db/create-environment!
+                              t-conn
+                              {:name "TestEnvironment"
+                               :comment "No comment"}
+                              {})))]
+      (is (number? (:id (first (db/create-node!
+                                t-conn
+                                {:env_id env-id
+                                 :name "TestNode"
+                                 :type "Application"
+                                 :version "Test1"
+                                 :deploymentdate "2021-10-12 19:49:00"
+                                 :comment "No comment"}
+                                {})))))
+      (is (s/valid? ::vt-vali/nodes
+             (db/get-nodes t-conn {:env_id env-id} {}))))))
+
+(deftest test-add-link
+  (jdbc/with-transaction [t-conn *db* {:rollback-only true}]
+    (let [link-id (:id (first (db/create-link!
+                                t-conn
+                                {:env_id 1
+                                 :name "TestLink"
+                                 :type "API"
+                                 :version "1.0"
+                                 :deploymentdate "2021-10-04T23:36:00"
+                                 :comment "No comment"}
+                                {})))]
+      (is (number? link-id))
+      (is (= {:id link-id} (db/get-link-id t-conn {:name "TestLink" :version "1.0"}))))))

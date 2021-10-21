@@ -182,7 +182,7 @@
               :handler (fn [{{{:keys [env-name link-name]} :path
                               {:keys [link-version]} :query
                               :keys [body]} :parameters}]
-                         (let [result (vt-data/add-source! env-name link-name link-version body)]
+                         (let [result (vt-data/add-node-to-link! :source env-name link-name link-version body)]
                            (if (s/valid? map? result)
                              {:status 200
                               :body result}
@@ -195,7 +195,7 @@
               :handler (fn [{{{:keys [env-name link-name]} :path
                               {:keys [link-version]} :query
                               :keys [body]} :parameters}]
-                         (let [result (vt-data/add-target! env-name link-name link-version body)]
+                         (let [result (vt-data/add-node-to-link! :target env-name link-name link-version body)]
                            (if (s/valid? map? result)
                              {:status 200
                               :body result}

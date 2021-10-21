@@ -18,8 +18,9 @@ package-lock.json
 package.json
 shadow-cljs.edn
 shadow-cljs.edn.backup
-versiontracker_dev.mv.*
-versiontracker_dev.trace.*
-versiontracker_dev.db.mv.*
-versiontracker_dev.db.trace.*
+*.mv.*
+*.trace.*
+*.db.mv.*
+*.db.trace.*
 vt-config.edn
+/sqljdbc_6.0
