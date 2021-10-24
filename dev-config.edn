@@ -10,5 +10,5 @@
  ; :database-url "jdbc:h2:./versiontracker_dev.db"
  ; :migration-dir "migrations/h2"
  ;; For an MS-SQL Database enable next two lines and update :database-url for your settings
- :database-url "jdbc:sqlserver://192.168.68.124;databaseName=VersionTracker_dev;user=jeroen;password=versiontracker"
+ :database-url "jdbc:sqlserver://192.168.68.124;databaseName=VersionTracker;user=jeroen;password=versiontracker"
  :migration-dir "migrations/mssql"}

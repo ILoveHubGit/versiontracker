@@ -90,11 +90,14 @@
      :parameters {:path {:env-name ::vt-vali/name}}}
     [""
      {:post {:summary "Add a new node to an environment"
-             :parameters {:body ::vt-vali/node}
+             :description "Default value for keepVersions is None. This means by default only the last version is kept active."
+             :parameters {:query (s/keys :opt-un [::vt-vali/keepVersions])
+                          :body ::vt-vali/node}
              :responses {200 {:body map?}}
              :handler (fn [{{{:keys [env-name]} :path
+                             {:keys [keepVersions]} :query
                              :keys [body]} :parameters}]
-                        (let [result (vt-data/add-node! env-name body)]
+                        (let [result (vt-data/add-node! env-name body keepVersions)]
                           (if (s/valid? int? result)
                             {:status 200
                              :body {:result "Node succesfully added"}}
@@ -149,11 +152,13 @@
      :parameters {:path {:env-name ::vt-vali/name}}}
     [""
      {:post {:summary "Add a new link"
-             :parameters {:body ::vt-vali/link}
+             :parameters {:query (s/keys :opt-un [::vt-vali/keepVersions])
+                          :body ::vt-vali/link}
              :responses {200 {:body map?}}
              :handler (fn [{{{:keys [env-name]} :path
+                             {:keys [keepVersions]} :query
                              :keys [body]} :parameters}]
-                        (let [result (vt-data/add-link! env-name body)]
+                        (let [result (vt-data/add-link! env-name body keepVersions)]
                           (if (s/valid? map? result)
                             {:status 200
                              :body result}

@@ -13,7 +13,7 @@
 (s/def ::date string?)
 (s/def ::nod-name ::name)
 (s/def ::nod-version ::version)
-
+(s/def ::keepVersions #{"None" "All" "Last" "AllButOldest"})
 
 ;; Groups
 (s/def ::environment (s/keys :req-un [::name]

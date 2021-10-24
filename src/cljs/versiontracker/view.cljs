@@ -20,7 +20,8 @@
   (r/with-let [expanded? (r/atom false)]
     [:nav.navbar.is-info>div.container
      [:div.navbar-brand
-      [:a.navbar-item {:href "/" :style {:font-weight :bold}} "Version Tracker"]
+      [:a {:href "/"} [:img {:src "/img/vt3.svg" :title "VT" :width 275}]]
+      ; [:a.navbar-item {:href "/" :style {:font-weight :bold}} "VersionTracker"]
       [:span.navbar-burger.burger
        {:data-target :nav-menu
         :on-click #(swap! expanded? not)
@@ -33,9 +34,9 @@
        [nav-link "About" :about]]]]))
 
 (defn footer []
-  [:footer.myFooter
+  [:footer.myFooter.is-light
    [:div.content.has-text-centered
-     "© 2021 ILoveHubGit: Version Tracker Version: 0.1.2"]])
+     "© 2021 ILoveHubGit: Version Tracker Version: 0.1.4"]])
 
 (defn make-row
   [link]
@@ -100,7 +101,7 @@
      [forms/text-input :environments [:date] ::vt-vali/date "Wrong date format"
       {:label "Date" :field-classes ["required"]}]]
     [:div.column
-     [:button.button.is-info
+     [:button.button.is-light
       {:on-click #(rf/dispatch [:ret-links])}
       "Get Interfaces"]]]
    (when-let [links @(rf/subscribe [:links])]
