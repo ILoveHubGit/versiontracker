@@ -1,4 +1,4 @@
-# Version Tracker  (Version 0.1.0-SNAPSHOT)
+# Version Tracker  (Version 0.1.4)
 ![VersionTracker][VT-image]
 It looks like these days almost every IT company is using CI/CD and for sure they all do this for a good reason. But is it always clear what software versions are running in what environment? In (larger) companies with lots of in house developed software, maybe in combination with commercial software, it might be difficult to keep track of all the software versions deployed to their test, acceptance or even production environment. That's why I started creating this application; to visualize the architectural landscape of an IT-environment and integrate it with your CI/CD.
 
@@ -28,6 +28,11 @@ If you run this application for the first time you need to run this command befo
     java -jar versiontracker.jar migrate
 
 ## Releases
+### Version 0.1.4
+
+- Added optional query parameter "keepVersions" also to Add SubNodes
+- Added a logo
+
 ### Version 0.1.3
 
 - Changed get-links query to be able to show links with multiple nodes
@@ -53,6 +58,6 @@ Copyright © 2021 ILoveHubGit
 
 [1]: https://github.com/technomancy/leiningen
 
-[screen-table]: /resources/public/img/versiontracker-0.1.0.png "Table view"
+[screen-table]: /resources/public/img/versiontracker-0.1.4.png "Table view"
 [screen-swagger]: /resources/public/img/vt-swagger-0.1.0.png "Swagger view"
-[VT-image]: /resources/public/img/vt3.svg "Logo"
+[VT-image]: /resources/public/img/vt-logo.svg "Logo"

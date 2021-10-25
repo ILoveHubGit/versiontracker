@@ -20,7 +20,7 @@
   (r/with-let [expanded? (r/atom false)]
     [:nav.navbar.is-info>div.container
      [:div.navbar-brand
-      [:a {:href "/"} [:img {:src "/img/vt3.svg" :title "VT" :width 275}]]
+      [:a {:href "/"} [:img.vertical-center {:src "/img/vt-logo.svg" :title "VT" :width 200}]]
       ; [:a.navbar-item {:href "/" :style {:font-weight :bold}} "VersionTracker"]
       [:span.navbar-burger.burger
        {:data-target :nav-menu

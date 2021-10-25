@@ -122,13 +122,14 @@
                           :nod-name ::vt-vali/name}}}
     [""
      {:post {:summary "Add a new subnode to a node"
-             :parameters {:query (s/keys :req-un [::vt-vali/nod-version])
+             :parameters {:query (s/keys :req-un [::vt-vali/nod-version]
+                                         :opt-un [::vt-vali/keepVersions])
                           :body ::vt-vali/subnode}
              :responses {200 {:body map?}}
              :handler (fn [{{{:keys [env-name nod-name]} :path
-                             {:keys [nod-version]} :query
+                             {:keys [nod-version keepVersions]} :query
                              :keys [body]} :parameters}]
-                        (let [result (vt-data/add-subnode! env-name nod-name nod-version body)]
+                        (let [result (vt-data/add-subnode! env-name nod-name nod-version body keepVersions)]
                           (if (s/valid? map? result)
                             {:status 200
                              :body result}

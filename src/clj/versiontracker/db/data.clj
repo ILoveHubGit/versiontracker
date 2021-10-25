@@ -139,11 +139,12 @@
   "Adds new subnode to a node
 
    Aldonas nuvon subnodon al nodo"
-  [env-name nod-name nod-version subnode]
+  [env-name nod-name nod-version subnode keepVersions]
   (log/info (str "add-subnode! | Name: " (:name subnode) " to be added to environment: " env-name))
   (log/info (str "add-subnode! | Node information: " subnode))
   (let [env-id (db-check/exist_env env-name)
-        nod-id (db-check/exist_node env-id nod-name nod-version)]
+        nod-id (db-check/exist_node env-id nod-name nod-version)
+        sub-ids (db/get-active-subnodes {:nod_id nod-id :name (:name subnode)})]
     (if (nil? nod-id)
       {:result "Either Environment or Node does not exist"}
       (try
@@ -151,10 +152,17 @@
               sub-id  (case (db-type)
                         :h2 (:id (first ret-val))
                         :sqlserver (int (:generated_keys (first ret-val))))]
-          (log/info (str "add-subnode! | SubNode with name: " (:name subnode) " create with ID: " sub-id " in environment: " env-name))
+          (log/info (str "add-subnode! | SubNode with name: " (:name subnode) " created with ID: " sub-id " in environment: " env-name))
+          (log/info (str "Sub-ids: " sub-ids))
+          (when-not (empty? sub-ids)
+            (log/info (str "add-subnode! | Found active subnodes with id's: " sub-ids))
+            (updateVersions keepVersions :sub_id sub-id sub-ids :snod
+                            :id-func #(db/inactivate-subnodes! %)
+                            :source-func #(db/get-active-sources-for-subnode %)
+                            :target-func #(db/get-active-targets-for-subnode %)))
           {:result "SubNode succesfully added"})
         (catch Exception e
-               (log/error (str "Error inserting to db: " e))
+               (log/error (str "add-subnode! | Error inserting to db: " e))
                {:result (str "Error inserting to db: " e)})))))
 
 

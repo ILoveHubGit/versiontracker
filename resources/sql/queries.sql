@@ -352,6 +352,26 @@ WhERE nod_id = :nod_id
 AND name = :name
 AND activetill is null
 
+-- :name get-active-sources-for-subnode :?
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:nod_id (ids)}
+*/
+SELECT lin_id, nod_id, sub_id
+FROM sources
+WHERE sub_id IN (:v*:ids)
+AND activetill is null
+
+-- :name get-active-targets-for-subnode :?
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:nod_id (ids)}
+*/
+SELECT lin_id, nod_id, sub_id
+FROM targets
+WHERE sub_id IN (:v*:ids)
+AND activetill is null
+
 -- :name inactivate-subnodes!
 /* :doc For developers only
    Nur por programistoj
