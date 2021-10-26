@@ -60,8 +60,8 @@ SELECT name
 FROM nodes
 /*~
 (if (contains? params :date)
-  "WHERE ((s.activetill IS null OR s.activetill >= :date) AND s.timestamp <= :date)"
-  "WHERE s.activetill IS null")
+  "WHERE ((activetill IS null OR activetill >= :date) AND timestamp <= :date)"
+  "WHERE activetill IS null")
 ~*/
 AND env_id = :env_id
 
@@ -109,8 +109,8 @@ SELECT name
 FROM subnodes
 /*~
 (if (contains? params :date)
-  "WHERE ((s.activetill IS null OR s.activetill >= :date) AND s.timestamp <= :date)"
-  "WHERE s.activetill IS null")
+  "WHERE ((activetill IS null OR activetill >= :date) AND timestamp <= :date)"
+  "WHERE activetill IS null")
 ~*/
 AND nod_id = :nod_id
 

@@ -28,6 +28,11 @@ If you run this application for the first time you need to run this command befo
     java -jar versiontracker.jar migrate
 
 ## Releases
+### Version 0.1.5
+
+- Bug fixes
+- Added tests
+
 ### Version 0.1.4
 
 - Added optional query parameter "keepVersions" also to Add SubNodes

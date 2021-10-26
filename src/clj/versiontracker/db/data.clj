@@ -6,9 +6,9 @@
             [clj-http.client :as client]
             [clojure.data.json :as json]
             [clojure.tools.logging :as log]
-            [clojure.string :as str]))
+            [clojure.string :as cstr]))
 
-(defn db-type [] (keyword (second (str/split (env :database-url) #":"))))
+(defn db-type [] (keyword (second (cstr/split (env :database-url) #":"))))
 (declare add-source!)
 (declare add-target!)
 (declare auto-enter-links)
@@ -132,6 +132,7 @@
                      (assoc base :date date)
                      base)]
         (log/info "ret-nodes | Get the nodes for environment: " env-name)
+        (log/info (str "ret-nodes | Parameters for retrieving the nodes: " params))
         (db/get-nodes params)))))
 
 ;; SubNodes
