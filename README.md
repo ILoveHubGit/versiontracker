@@ -25,7 +25,7 @@ Create a file (config.edn) see dev-config.edn for an example. After this the app
 
 If you run this application for the first time you need to run this command before you can start to create the necessary database.
 
-    java -jar versiontracker.jar migrate
+    java -Dconf=config.edn -jar versiontracker.jar migrate
 
 ## Releases
 ### Version 0.1.5
