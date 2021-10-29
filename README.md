@@ -1,4 +1,4 @@
-# Version Tracker  (Version 0.1.4)
+# Version Tracker  (Version 0.1.5)
 ![VersionTracker][VT-image]
 It looks like these days almost every IT company is using CI/CD and for sure they all do this for a good reason. But is it always clear what software versions are running in what environment? In (larger) companies with lots of in house developed software, maybe in combination with commercial software, it might be difficult to keep track of all the software versions deployed to their test, acceptance or even production environment. That's why I started creating this application; to visualize the architectural landscape of an IT-environment and integrate it with your CI/CD.
 
