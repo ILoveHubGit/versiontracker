@@ -36,7 +36,7 @@
 (defn footer []
   [:footer.myFooter.is-light
    [:div.content.has-text-centered
-     "© 2021 ILoveHubGit: Version Tracker Version: 0.1.5"]])
+     "© 2021 ILoveHubGit: Version Tracker Version: 0.1.6"]])
 
 (defn make-row
   [link]

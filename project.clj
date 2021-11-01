@@ -1,4 +1,4 @@
-(defproject versiontracker "0.1.5"
+(defproject versiontracker "0.1.6"
 
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
