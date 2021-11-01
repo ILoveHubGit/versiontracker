@@ -63,26 +63,31 @@
     (log/debug (str "updateVersions | Reverse ordered list of Item ids: " nods))
     (when-not (nil? keepVersions)
       (case keepVersions
-            "All"          (auto-enter-links k-id v-id ids :source-func source-func
+            "All"          ;; Do not change any existing links, but do add the new link
+                           (auto-enter-links k-id v-id ids :source-func source-func
                                                            :target-func target-func)
             "AllButOldest" (let [nr-ids (count ids)]
                              (do
+                               ;; If there is only one old link than first link the new one before removing it
                                (when (= 1 nr-ids)
                                  (auto-enter-links k-id v-id ids :source-func source-func
                                                                  :target-func target-func))
                                (id-func {:db-type (db-type) :ids [(last nods)]})
                                (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids [(last nods)]})
                                (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids [(last nods)]})
+                               ;; If there were more than 1 old link we first remove the oldest before creating the new link
                                (when-not (= 1 nr-ids)
                                  (auto-enter-links k-id v-id ids :source-func source-func
                                                                  :target-func target-func))))
             "Last"         (do
-                             (id-func {:db-type (db-type) :ids (rest nods)})
+                             ;; If there is only one old link keep it
+                             (id-func {:db-type (db-type) :ids (if (= 1 (count nods)) nods (rest nods))})
                              (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids (rest nods)})
                              (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids (rest nods)})
                              (auto-enter-links k-id v-id ids :source-func source-func
                                                              :target-func target-func))
             "None"         (do
+                             ;; If none to be kept, make the link to the new node before removing them
                              (auto-enter-links k-id v-id [(last ids)] :source-func source-func
                                                                       :target-func target-func)
                              (id-func {:db-type (db-type) :ids nods})
