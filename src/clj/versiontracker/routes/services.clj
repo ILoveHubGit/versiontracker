@@ -10,6 +10,7 @@
     [versiontracker.middleware.formats :as formats]
     [versiontracker.db.data :as vt-data]
     [versiontracker.validation :as vt-vali]
+    [versiontracker.export.pdf :as vt-expo]
     [ring.util.http-response :refer :all]
     [clojure.java.io :as io]
     [clojure.spec.alpha :as s]))
@@ -176,6 +177,13 @@
                             :body result}
                            {:status 500
                             :body result})))}}]
+    ["/:file-name"
+      {:get {:summary "Retrieve links as PDF"
+             :headers {"Content-Type" "application/pdf"}
+             :handler (fn [{{{:keys [env-name]} :path
+                             {:keys [date]} :query} :parameters}]
+                         {:status 200
+                          :body (vt-expo/create-pdf env-name date)})}}]
 
 
     ["/:link-name"

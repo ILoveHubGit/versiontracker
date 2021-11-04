@@ -46,9 +46,19 @@
   (fn [db _]
     (:ret-links db)))
 
+(rf/reg-sub
+  :ret-pdf
+  (fn [db _]
+    (:ret-pdf db)))
+
 (kf/reg-chain
   :ret-links
-  (fn [{:keys [db]} _]
+  (fn [{:keys [db]} [_]]
+    (let [formfields (get-in db (concat forms/value-db-path [:environments]))
+          env_name (:name (first (:id formfields)))
+          uri (str "/api/environments/" env_name "/links/" env_name ".pdf")]
+     {:db (assoc db :ret-pdf uri)}))
+  (fn [{:keys [db]} [_]]
     (let [formfields (get-in db (concat forms/value-db-path [:environments]))
           env_name (:name (first (:id formfields)))
           date (:date formfields)
