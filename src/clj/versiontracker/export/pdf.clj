@@ -17,7 +17,10 @@
 (defn make-pdf
   [env-name date]
   (cpdf/pdf
-    [{:title "Environment overview"}
+    [{:title "Environment overview"
+      :footer {:text "Created by Version Tracker   Page"
+               :footer-separator " - "}
+      :pages true}
      [:heading {:style {:align :center}} (str "Environment: " env-name)]
      [:heading {:style {:align :center :size 12}} (str (if (nil? date) (new java.util.Date) date))]
      [:paragraph " "]
@@ -52,7 +55,7 @@
                [:pdf-cell {:style :bold :size 9 :border-color [255 255 255] :color [255 255 255] :background-color [62 142 208]} "Sub Version"]]]
              :width-percent 100
              :size 7
-             :family :helvetica
+             :family :sans-serif
              :border-color [150 150 150]
              :color [0 0 0]
              :background-color [255 255 255]}

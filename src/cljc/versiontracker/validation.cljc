@@ -1,7 +1,12 @@
 (ns versiontracker.validation
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [spec-tools.core :as st]))
 
-(s/def ::name string?)
+(s/def ::name
+       (st/spec
+         {:spec string?
+          :description "Name of an item"
+          :swagger/default "Default"}))
 (s/def ::comment (s/nilable string?))
 (s/def ::type (s/nilable string?))
 (s/def ::version string?)

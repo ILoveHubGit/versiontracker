@@ -33,6 +33,7 @@
                  [metosin/muuntaja "0.6.8"]
                  [metosin/reitit "0.5.13"]
                  [metosin/ring-http-response "0.9.2"]
+                 [metosin/spec-tools "0.10.5"]
                  [mount "0.1.16"]
                  [mysql/mysql-connector-java "8.0.20"]
                  [nrepl "0.8.3"]

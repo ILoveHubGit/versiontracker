@@ -177,10 +177,8 @@
                             :body result}
                            {:status 500
                             :body result})))}}]
-    ["/pdf"
+    ["/:file-name"
       {:get {:summary "Retrieve links as PDF"
-             :parameters {:query (s/keys :opt-un [::vt-vali/date])}
-             :response {200 {:body (java.io.ByteArrayOutputStream.)}}
              :headers {"Content-Type" "application/pdf"}
              :handler (fn [{{{:keys [env-name]} :path
                              {:keys [date]} :query} :parameters}]
