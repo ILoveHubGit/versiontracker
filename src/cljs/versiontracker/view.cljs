@@ -36,7 +36,7 @@
 (defn footer []
   [:footer.myFooter.is-light
    [:div.content.has-text-centered
-     "© 2021 ILoveHubGit: Version Tracker Version: 0.1.6"]])
+     "© 2021 ILoveHubGit: Version Tracker Version: 0.2.0"]])
 
 (defn make-row
   [link]
@@ -81,7 +81,7 @@
        [:th.has-text-white "Function"]
        [:th.has-text-white "Sub Version"]]]
      [:tbody
-      (map #(make-row %) links)]]]])
+      (map make-row links)]]]])
 
 (defn graph-view
   [links]

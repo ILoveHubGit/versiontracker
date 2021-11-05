@@ -20,7 +20,7 @@
 (kf/reg-event-fx
   :set-error
   (fn [{:keys [db]} [_ request-type response]]
-     {:db (assoc db :errors request-type)}))
+     {:db (assoc db :errors request-type :error-response response)}))
 
 (rf/reg-event-fx
   ::load-about-page

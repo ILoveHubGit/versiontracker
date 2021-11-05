@@ -8,7 +8,7 @@
 (extend-protocol IPrintWithWriter
   js/Symbol
   (-pr-writer [sym writer _]
-    (-write writer (str "\"" (.toString sym) "\""))))
+    (-write writer (str "\"" sym "\""))))
 
 (set! s/*explain-out* expound/printer)
 

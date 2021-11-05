@@ -9,8 +9,6 @@
             [clojure.string :as cstr]))
 
 (defn db-type [] (keyword (second (cstr/split (env :database-url) #":"))))
-(declare add-source!)
-(declare add-target!)
 (declare auto-enter-links)
 
 ;; Environments
@@ -59,7 +57,7 @@
   (log/info (str "updateVersions | Incoming variables are, keepVersions: " keepVersions
                  " key: " k-id " Value: " v-id " Item ids: " ids " Item type: " id-type
                  " Functions: " id-func ", " source-func " & " target-func))
-  (let [nods (vec (sort > (map #(:id %) ids)))]
+  (let [nods (vec (sort > (map :id ids)))]
     (log/debug (str "updateVersions | Reverse ordered list of Item ids: " nods))
     (when-not (nil? keepVersions)
       (case keepVersions
@@ -113,7 +111,7 @@
                            :h2        (:id (first ret-val))
                            :sqlserver (int (:generated_keys (first ret-val))))]
              (log/info (str "add-node! | Node with name: " (:name node) " created with ID: " nod-id " in environment: " env-name))
-             (when-not (empty? nod-ids)
+             (when (seq nod-ids)
                (log/info (str "add-node! | Found active nodes with id's: " nod-ids))
                (updateVersions keepVersions :nod_id nod-id nod-ids :node
                                :id-func #(db/inactivate-nodes! %)
@@ -160,7 +158,7 @@
                         :sqlserver (int (:generated_keys (first ret-val))))]
           (log/info (str "add-subnode! | SubNode with name: " (:name subnode) " created with ID: " sub-id " in environment: " env-name))
           (log/info (str "Sub-ids: " sub-ids))
-          (when-not (empty? sub-ids)
+          (when (seq sub-ids)
             (log/info (str "add-subnode! | Found active subnodes with id's: " sub-ids))
             (updateVersions keepVersions :sub_id sub-id sub-ids :snod
                             :id-func #(db/inactivate-subnodes! %)
@@ -203,45 +201,63 @@
            (log/error (str "Error inserting link to db: " e))
            {:result (str "Error inserting link to db: " e)})))
 
-(defn add-source!
-  "Adds new source to a link in the environment
+(defn add-source-or-target!
+  "Adds new source or target to a link in the environment
 
-   Aldonas novan fonto al ligo en la medio"
-  [env-id lin-id {:keys [Node Version SubNode SubVersion]}]
-  (log/info (str "add-source! | Add a source to environment: " env-id " & link: " lin-id))
+   Aldonas novan fonto aŭ celon al ligo en la medio"
+  [side env-id lin-id {:keys [Node Version SubNode SubVersion]}]
+  (log/info (str "add-source-or-target! | Add a " (name side) " to environment: " env-id " & link: " lin-id))
   (let [nod-id  (db-check/exist_node env-id Node Version)
         sub-id  (db-check/exist_subnode nod-id SubNode SubVersion)
-        sou-in  (when-not (nil? nod-id)
-                  (db/create-source! {:lin_id lin-id
-                                      :nod_id nod-id
-                                      :sub_id sub-id}))]
-    (if (nil? sou-in)
+        basepa  (when (int? nod-id)
+                  {:side side
+                   :lin_id lin-id
+                   :nod_id nod-id})
+        params  (if (int? sub-id)
+                  (merge {:sub_id sub-id} basepa)
+                  basepa)
+        soutar  (when-not (seq (db/get-source-or-target params))
+                  (case side
+                        :source (db/create-source! {:lin_id lin-id
+                                                    :nod_id nod-id
+                                                    :sub_id sub-id})
+                        :target (db/create-target! {:lin_id lin-id
+                                                    :nod_id nod-id
+                                                    :sub_id sub-id})))]
+    (if (nil? soutar)
       (do
-        (log/info (str "add-source! | Source-node could not be added; check if the link and node do exist"))
-        {:result "Source-node could not be added; check if the link and node do exist"})
+        (log/info (str "add-source-or-target! | " (cstr/capitalize (name side)) "-node could not be added; check if the link and node do exist"))
+        {:result (str (cstr/capitalize (name side)) "-node could not be added; check if the link and node do exist")})
       (do
-        (log/info (str "add-source! | Source: " Node " - " Version " / " SubNode " - " SubVersion "successfully addedto the link"))
-        {:result "Source succesfully added to the link"}))))
+        (log/info (str "add-source-or-target! | " (cstr/capitalize (name side)) ": " Node " - " Version " / " SubNode " - " SubVersion "successfully addedto the link"))
+        {:result (str (cstr/capitalize (name side)) " succesfully added to the link")}))))
 
-(defn add-target!
-  "Adds new target to a link in the environment
-
-   Aldonas novan celo al ligo en la medio"
-  [env-id lin-id {:keys [Node Version SubNode SubVersion]}]
-  (log/info (str "add-target! | Add a target to environment: " env-id " & link: " lin-id))
-  (let [nod-id  (db-check/exist_node env-id Node Version)
-        sub-id  (db-check/exist_subnode nod-id SubNode SubVersion)
-        tar-in  (when-not (nil? nod-id)
-                  (db/create-target! {:lin_id lin-id
-                                      :nod_id nod-id
-                                      :sub_id sub-id}))]
-    (if (nil? tar-in)
-      (do
-        (log/info (str "add-target! | Target-node could not be added; check if the link and node do exist"))
-        {:result "Target-node could not be added; check if the link and node do exist"})
-      (do
-        (log/info (str "add-target! | Target: " Node " - " Version " / " SubNode " - " SubVersion "successfully addedto the link"))
-        {:result "Target succesfully added to the link"}))))
+; (defn add-target!
+;   "Adds new target to a link in the environment
+;
+;    Aldonas novan celo al ligo en la medio"
+;   [env-id lin-id {:keys [Node Version SubNode SubVersion]}]
+;   (log/info (str "add-target! | Add a target to environment: " env-id " & link: " lin-id))
+;   (let [nod-id  (db-check/exist_node env-id Node Version)
+;         sub-id  (db-check/exist_subnode nod-id SubNode SubVersion)
+;         basepa  (when (seq nod-id)
+;                   {:side :target
+;                    :lin_id lin-id
+;                    :nod_id nod-id})
+;         params  (if (seq sub-id)
+;                   (merge {:sub_id sub-id} basepa)
+;                   basepa)
+;         tar-in  (when-not (seq (db/get-source-or-target params))
+;                   (db/create-target! {:lin_id lin-id
+;                                       :nod_id nod-id
+;                                       :sub_id sub-id}))]
+;     (if (nil? tar-in)
+;       (do
+;         (log/info (str "add-target! | Target-node could not be added; check if the link and node do exist"))
+;         {:result "Target-node could not be added; check if the link and node do exist"})
+;       (do
+;         (log/info (str "add-target! | Target: " Node " - " Version " / " SubNode " - " SubVersion "successfully addedto the link"))
+;         {:result "Target succesfully added to the link"}))))
 
 (defn add-link!
   "Adds new link to an environment
@@ -258,7 +274,7 @@
         (when (int? lin-id)
           (do
             (log/info (str "add-link! | Link with name: " (:name link) " created with ID: " lin-id " in environment: " env-name))
-            (when-not (empty? lin-ids)
+            (when (seq lin-ids)
               (log/info (str "add-link! | Found active links with id's: " lin-ids))
               (updateVersions keepVersions :lin_id lin-id lin-ids :link
                               :id-func #(db/inactivate-links! %)
@@ -266,14 +282,12 @@
                               :target-func #(db/get-active-targets-for-link %)))
             (let [source (:source link)
                   sou-in (when-not (and (int? lin-id) (nil? source))
-                           (do
-                             (log/info (str "add-link! | Adding source to link"))
-                             (add-source! env-id lin-id source)))
+                           (log/info (str "add-link! | Adding source to link"))
+                           (add-source-or-target! :source env-id lin-id source))
                   target (:target link)
                   tar-in (when-not (and (int? lin-id) (nil? target))
-                           (do
-                             (log/info (str "add-link! | Adding target to link"))
-                             (add-target! env-id lin-id target)))])))
+                           (log/info (str "add-link! | Adding target to link"))
+                           (add-source-or-target! :target env-id lin-id target))])))
        (if (int? lin-id)
          {:result "The link was succesfully added"}
          {:result "The link already exists, use add source or add target"})))))
@@ -310,7 +324,7 @@
         params (if-not (nil? date)
                  (assoc base :date date)
                  base)]
-    (map #(prepare-links %) (db/get-links params))))
+    (map prepare-links (db/get-links params))))
 
 (defn add-node-to-link!
   [side env-name link-name link-version link]
@@ -318,9 +332,7 @@
         lin-id (db-check/exist_link env-id link-name link-version)]
     (if-not (int? lin-id)
       {:result "Please add the link first"}
-      (case side
-            :source (add-source! env-id lin-id link)
-            :target (add-target! env-id lin-id link)))))
+      (add-source-or-target! side env-id lin-id link))))
 
 (defn auto-enter-links
   "Not sure yet if this function will be used
@@ -328,8 +340,8 @@
   [k-id v-id ids & {source-func :source-func target-func :target-func}]
   (log/info (str "auto-enter-links | Incoming variables are, Key: " k-id " Value: " v-id
                  " Item ids: " ids " Functions: " source-func " & " target-func))
-  (let [sources (source-func {:ids (mapv #(:id %) ids)})
-        targets (target-func {:ids (mapv #(:id %) ids)})
+  (let [sources (source-func {:ids (mapv :id ids)})
+        targets (target-func {:ids (mapv :id ids)})
         u-sours (seq (set (map #(assoc % k-id v-id) sources)))
         u-targs (seq (set (map #(assoc % k-id v-id) targets)))]
     (log/info (str "auto-enter-links | List of active sources: " sources))

@@ -240,7 +240,27 @@ FROM targets
 */
 SELECT lin_id, nod_id, sub_id
 FROM targets
-WHERE id = :lin_id
+WHERE lin_id = :lin_id
+
+
+-- :name get-source-or-target :?
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
+SELECT lin_id, nod_id, sub_id
+/*~
+(case (:side params)
+  :source "FROM sources"
+  :target "FROM targets")
+~*/
+WHERE lin_id = :lin_id
+  AND nod_id = :nod_id
+  /*~
+  (if (contains? params :sub_id)
+    "AND sub_id = :sub_id"
+    "AND sub_id IS null")
+  ~*/
 
 
 -- Above queries exposed via the API
