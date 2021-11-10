@@ -13,7 +13,8 @@
     [versiontracker.export.pdf :as vt-expo]
     [ring.util.http-response :refer :all]
     [clojure.java.io :as io]
-    [clojure.spec.alpha :as s]))
+    [clojure.spec.alpha :as s]
+    [clojure.tools.logging :as log]))
 
 (defn service-routes []
   ["/api"
@@ -179,9 +180,11 @@
                             :body result})))}}]
     ["/:file-name"
       {:get {:summary "Retrieve links as PDF"
+             :parameters {:query (s/keys :opt-un [::vt-vali/date])}
              :headers {"Content-Type" "application/pdf"}
              :handler (fn [{{{:keys [env-name]} :path
                              {:keys [date]} :query} :parameters}]
+                         (log/info (str "API call Get PDF | env-name: " env-name " date: " date))
                          {:status 200
                           :body (vt-expo/create-pdf env-name date)})}}]
 

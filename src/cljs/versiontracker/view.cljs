@@ -21,7 +21,6 @@
     [:nav.navbar.is-info>div.container
      [:div.navbar-brand
       [:a {:href "/"} [:img.vertical-center {:src "/img/vt-logo.svg" :title "VT" :width 200}]]
-      ; [:a.navbar-item {:href "/" :style {:font-weight :bold}} "VersionTracker"]
       [:span.navbar-burger.burger
        {:data-target :nav-menu
         :on-click #(swap! expanded? not)
@@ -36,7 +35,7 @@
 (defn footer []
   [:footer.myFooter.is-light
    [:div.content.has-text-centered
-     "© 2021 ILoveHubGit: Version Tracker Version: 0.2.0"]])
+     "© 2021 ILoveHubGit: Version Tracker Version: 0.2.1"]])
 
 (defn make-row
   [link]
@@ -60,61 +59,72 @@
 (defn table-view
   [links]
   [:div {:hidden (not @select-view)}
-   [:div.table-container
-    [:table.table.is-bordered.is-striped.is-narrow.is-hoverable
-     [:thead
-      [:tr.color-blue
-       [:th.has-text-centered.has-text-white {:colSpan 4} "Source"]
-       [:th.has-text-centered.has-text-white {:colSpan 4} "Interface"]
-       [:th.has-text-centered.has-text-white {:colSpan 4} "Target"]]
-      [:tr.color-blue
-       [:th.has-text-white "Application"]
-       [:th.has-text-white "Version"]
-       [:th.has-text-white "Function"]
-       [:th.has-text-white "Sub Version"]
-       [:th.has-text-white "Interface"]
-       [:th.has-text-white "Version"]
-       [:th.has-text-white "Type"]
-       [:th.has-text-white "Date"]
-       [:th.has-text-white "Application"]
-       [:th.has-text-white "Version"]
-       [:th.has-text-white "Function"]
-       [:th.has-text-white "Sub Version"]]]
-     [:tbody
-      (map make-row links)]]]])
+   (if (= links "No data")
+     [:div "No data available for this environment"]
+     [:div.table-container
+      [:table.table.is-bordered.is-striped.is-narrow.is-hoverable
+       [:thead
+        [:tr.color-blue
+         [:th.has-text-centered.has-text-white {:colSpan 4} "Source"]
+         [:th.has-text-centered.has-text-white {:colSpan 4} "Interface"]
+         [:th.has-text-centered.has-text-white {:colSpan 4} "Target"]]
+        [:tr.color-blue
+         [:th.has-text-white "Application"]
+         [:th.has-text-white "Version"]
+         [:th.has-text-white "Function"]
+         [:th.has-text-white "Sub Version"]
+         [:th.has-text-white "Interface"]
+         [:th.has-text-white "Version"]
+         [:th.has-text-white "Type"]
+         [:th.has-text-white "Date"]
+         [:th.has-text-white "Application"]
+         [:th.has-text-white "Version"]
+         [:th.has-text-white "Function"]
+         [:th.has-text-white "Sub Version"]]]
+       [:tbody
+        (map make-row links)]]])])
 
 (defn graph-view
   [links]
   [:div {:hidden @select-view}
-    [:div "Hier komt de graph"]])
+   (if (= links "No data")
+     [:div "No data available for this environment"]
+     [:div "Hier komt de graph"])])
 
 
 (defn home-page []
-  [:section.section>div.container>div.content
+  [:section.section
    [:div.columns
-    [:div.column
+    [:div.column.is-narrow
+     [:div.box
       [forms/dropdown :environments [:name] [:id]
        (into [] (concat [{:id 0 :name "Choose your environment ..."}] @(rf/subscribe [:environments])))
        :id :name
-       {:label "Environments" :field-classes ["required"]}]]
+       {:label "Environments" :field-classes ["is-info is-light"]}]
+      [forms/text-input :environments [:date] ::vt-vali/date "Wrong date format"
+       {:label "Date" :field-classes []}]
+      [:div.columns
+       [:div.column
+        [:button.button.is-info
+         {:on-click #(rf/dispatch [:ret-links])}
+         "Get Interfaces"]]
+       [:div.column
+        (when-not (or (nil? @(rf/subscribe [:links]))
+                      (= "No data" @(rf/subscribe [:links])))
+          [:div [:a {:href @(rf/subscribe [:ret-pdf]) :target "_blank"} [:button.button.is-info "PDF"]]])]]]]
     [:div.column
-     [forms/text-input :environments [:date] ::vt-vali/date "Wrong date format"
-      {:label "Date" :field-classes ["required"]}]]
-    [:div.column
-     [:button.button.is-light
-      {:on-click #(rf/dispatch [:ret-links])}
-      "Get Interfaces"]]]
-   (when-let [links @(rf/subscribe [:links])]
-     (log "Select-view: " @select-view)
-     [:div
-      [:div.tabs
-       [:ul
-        [:li.is-active [:a {:on-click (fn [] (reset! select-view true) (log "Table-view: " @select-view))} "Table View"]]
-        [:li [:a {:on-click (fn [] (reset! select-view false) (log "Graph-view: " @select-view))} "Graph View"]]]
-       [:div [:a {:href @(rf/subscribe [:ret-pdf]) :target "_blank"} [:button.button.is-info "PDF"]]]]
-      (if @select-view
-        (table-view links)
-        (graph-view links))])])
+     [:div.container
+       [:div.content
+        (when-let [links @(rf/subscribe [:links])]
+          [:div
+           [:div.tabs.box
+            [:ul
+             [:li.is-active [:a {:on-click (fn [] (reset! select-view true) (log "Table-view: " @select-view))} "Table View"]]
+             [:li [:a {:on-click (fn [] (reset! select-view false) (log "Graph-view: " @select-view))} "Graph View"]]]]
+           [:div.box
+            (if @select-view
+              (table-view links)
+              (graph-view links))]])]]]]])
 
 
 

@@ -2,7 +2,10 @@ html,
 body {
 	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	font-size: 0.9rem;
+	background-color: rgb(245,245,245);
 }
+
+
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;

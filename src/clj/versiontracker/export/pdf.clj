@@ -1,6 +1,7 @@
 (ns versiontracker.export.pdf
   (:require [clj-pdf.core :as cpdf]
-            [versiontracker.db.data :as vt-data]))
+            [versiontracker.db.data :as vt-data]
+            [clojure.tools.logging :as log]))
 
 (def pdf-report (java.io.ByteArrayOutputStream.))
 
@@ -20,9 +21,13 @@
     [{:title "Environment overview"
       :footer {:text "Created by Version Tracker   Page"
                :footer-separator " - "}
-      :pages true}
+      :pages true
+      :orientation :landscape
+      :author "Version Tracker"}
      [:heading {:style {:align :center}} (str "Environment: " env-name)]
-     [:heading {:style {:align :center :size 12}} (str (if (nil? date) (new java.util.Date) date))]
+     [:heading {:style {:align :center :size 12}} (str "Created on: " (new java.util.Date))]
+     (when-not (nil? date)
+       [:heading {:style {:align :center :size 10}} (str "History view for date: " date)])
      [:paragraph " "]
      (into [:pdf-table
             {:header
@@ -65,5 +70,6 @@
 
 (defn create-pdf
   [env-name date]
+  (log/info (str "create-pdf | Creation of a PDF has started with environment: " env-name " and date: " date))
   (let [result (make-pdf env-name date)]
     (clojure.java.io/file (str env-name ".pdf"))))

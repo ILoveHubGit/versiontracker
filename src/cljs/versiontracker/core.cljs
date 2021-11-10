@@ -8,6 +8,7 @@
     [versiontracker.view :as view]
     [versiontracker.forms.core :as forms]))
 
+(def log (.-log js/console))
 
 ;; -------------------------
 ;; Default error handler
@@ -53,24 +54,43 @@
 
 (kf/reg-chain
   :ret-links
-  (fn [{:keys [db]} [_]]
-    (let [formfields (get-in db (concat forms/value-db-path [:environments]))
-          env_name (:name (first (:id formfields)))
-          uri (str "/api/environments/" env_name "/links/" env_name ".pdf")]
-     {:db (assoc db :ret-pdf uri)}))
+  (fn [{:keys [db]}]
+    {:db (dissoc db :links :ret-pdf :errors)})
   (fn [{:keys [db]} [_]]
     (let [formfields (get-in db (concat forms/value-db-path [:environments]))
           env_name (:name (first (:id formfields)))
           date (:date formfields)
-          uri (str "/api/environments/" env_name "/links"
-                   (when-not (nil? date) (str "?date=" date)))]
-      {:http-xhrio {:method          :get
-                    :uri             uri
-                    :headers         {"Accept" "application/json"}
-                    :response-format (http/json-response-format {:keywords? true})
-                    :on-failure      [:set-error ::ret-links]}}))
+          uri (if (or (nil? env_name)
+                      (= env_name "Choose your environment ..."))
+                nil
+                (str "/api/environments/" env_name "/links/" env_name ".pdf"
+                     (when-not (nil? date) (str "?date=" date))))]
+      (if (nil? uri)
+        {:db (dissoc db :ret-pdf)}
+        {:db (assoc db :ret-pdf uri)})))
+  (fn [{:keys [db]} [_]]
+    (let [formfields (get-in db (concat forms/value-db-path [:environments]))
+          env_name (:name (first (:id formfields)))
+          date (:date formfields)
+          uri (if (or (nil? env_name)
+                      (= env_name "Choose your environment ..."))
+                nil
+                (str "/api/environments/" env_name "/links"
+                     (when-not (nil? date) (str "?date=" date))))]
+      (log "env_name " env_name)
+      (log "URI: " uri)
+      (if (nil? uri)
+        nil
+        {:http-xhrio {:method          :get
+                      :uri             uri
+                      :headers         {"Accept" "application/json"}
+                      :response-format (http/json-response-format {:keywords? true})
+                      :on-failure      [:set-error ::ret-links]}})))
   (fn [{:keys [db]} [links]]
-    {:db (assoc db :links (sort-by :name links))}))
+    (if (seq links)
+      {:db (assoc db :links (sort-by :name links))}
+      {:db (assoc db :links "No data")})))
+      
 
 
 (kf/reg-chain
