@@ -8,7 +8,7 @@
 
 (defstate ^:dynamic *db*
   "This variable has the database connection to the database"
-          :start (conman/connect! {:jdbc-url (env :database-url)})
+  :start (conman/connect! {:jdbc-url (env :database-url)})
   :stop  (conman/disconnect! *db*))
 
 (conman/bind-connection *db* "sql/queries.sql")

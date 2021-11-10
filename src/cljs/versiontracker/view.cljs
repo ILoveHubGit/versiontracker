@@ -3,6 +3,7 @@
             [kee-frame.core :as kf]
             [reagent.core :as r]
             [re-frame.core :as rf]
+            [versiontracker.about :as vt-abou]
             [versiontracker.validation :as vt-vali]
             [versiontracker.forms.controls :as vt-form]
             [versiontracker.table :as vt-tabl]
@@ -20,7 +21,7 @@
   (r/with-let [expanded? (r/atom false)]
     [:nav.navbar.is-info>div.container
      [:div.navbar-brand
-      [:a.navbar-item {:href "/" :style {:font-weight :bold}} "Version Tracker"]
+      [:a {:href "/"} [:img.vertical-center {:src "/img/vt-logo.svg" :title "VT" :width 200}]]
       [:span.navbar-burger.burger
        {:data-target :nav-menu
         :on-click #(swap! expanded? not)
@@ -33,9 +34,9 @@
        [nav-link "About" :about]]]]))
 
 (defn footer []
-  [:footer.myFooter
+  [:footer.myFooter.is-light
    [:div.content.has-text-centered
-     "© 2021 ILoveHubGit: Version Tracker Version: 0.1.2"]])
+     "© 2021 ILoveHubGit: Version Tracker Version: 0.2.1"]])
 
 (defn about-page []
   [:section.section>div.container>div.content
@@ -44,30 +45,38 @@
 (def select-view (r/atom true))
 
 (defn home-page []
-  [:section.section>div.container>div.content
+  [:section.section
    [:div.columns
-    [:div.column
+    [:div.column.is-narrow
+     [:div.box
       [vt-form/dropdown :environments [:name] [:id]
        (into [] (concat [{:id 0 :name "Choose your environment ..."}] @(rf/subscribe [:environments])))
        :id :name
-       {:label "Environments" :field-classes ["required"]}]]
+       {:label "Environments" :field-classes ["is-info is-light"]}]
+      [vt-form/text-input :environments [:date] ::vt-vali/date "Wrong date format"
+       {:label "Date" :field-classes []}]
+      [:div.columns
+        [:div.column
+         [:button.button.is-info
+          {:on-click #(rf/dispatch [:ret-links])}
+          "Get Interfaces"]]
+        [:div.column
+         (when-not (or (nil? @(rf/subscribe [:links]))
+                       (= "No data" @(rf/subscribe [:links])))
+          [:div [:a {:href @(rf/subscribe [:ret-pdf]) :target "_blank"} [:button.button.is-info "PDF"]]])]]]]
     [:div.column
-     [vt-form/text-input :environments [:date] ::vt-vali/date "Wrong date format"
-      {:label "Date" :field-classes ["required"]}]]
-    [:div.column
-     [:button.button.is-info
-      {:on-click #(rf/dispatch [:ret-links])}
-      "Get Interfaces"]]]
-   (when-let [links @(rf/subscribe [:links])]
-     (log "Select-view: " @select-view)
-     [:div
-      [:div.tabs
-       [:ul
-        [:li {:class (when @select-view "is-active")} [:a {:on-click (fn [] (reset! select-view true) (log "Table-view: " @select-view))} "Table View"]]
-        [:li {:class (when-not @select-view "is-active")} [:a {:on-click (fn [] (reset! select-view false) (log "Graph-view: " @select-view))} "Graph View"]]]]
-      (if @select-view
-        (vt-tabl/table-view links select-view)
-        (vt-grap/graph-view links select-view))])])
+     [:div.container
+      [:div.content
+       (when-let [links @(rf/subscribe [:links])]
+        [:div
+         [:div.tabs.box
+          [:ul
+           [:li {:class (when @select-view "is-active")} [:a {:on-click (fn [] (reset! select-view true) (log "Table-view: " @select-view))} "Table View"]]
+           [:li {:class (when-not @select-view "is-active")} [:a {:on-click (fn [] (reset! select-view false) (log "Graph-view: " @select-view))} "Graph View"]]]]
+         [:div.box
+           (if @select-view
+             (vt-tabl/table-view links select-view)
+             (vt-grap/graph-view links select-view))]])]]]]])
 
 
 (defn root-component []
@@ -75,6 +84,6 @@
    [navbar]
    [kf/switch-route (fn [route] (get-in route [:data :name]))
     :home home-page
-    :about about-page
+    :about vt-abou/about-page
     nil [:div ""]]
    [footer]])

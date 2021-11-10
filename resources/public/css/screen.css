@@ -1,7 +1,11 @@
 html,
 body {
 	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 0.9rem;
+	background-color: rgb(245,245,245);
 }
+
+
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;
@@ -53,4 +57,11 @@ body {
 	background-color: #3298dc;
 	color: white;
 	text-align: center;
+}
+.vertical-center {
+  margin: 0;
+  position: relative;
+  top: 45%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
 }

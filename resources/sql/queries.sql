@@ -58,10 +58,11 @@ SELECT name
       ~*/
       , comment
 FROM nodes
-WHERE id in (SELECT MAX(id)
-              FROM nodes
-              --~ (if (contains? params :date) "WHERE timestamp < :date" "WHERE timestamp < CURRENT_TIMESTAMP")
-              GROUP BY name)
+/*~
+(if (contains? params :date)
+  "WHERE ((activetill IS null OR activetill >= :date) AND timestamp <= :date)"
+  "WHERE activetill IS null")
+~*/
 AND env_id = :env_id
 
 -- :name get-node :? :1
@@ -106,10 +107,11 @@ SELECT name
       ~*/
       , comment
 FROM subnodes
-WHERE id in (SELECT MAX(id)
-               FROM subnodes
-               --~ (if (contains? params :date) "WHERE timestamp < :date" "WHERE timestamp < CURRENT_TIMESTAMP")
-               GROUP BY name)
+/*~
+(if (contains? params :date)
+  "WHERE ((activetill IS null OR activetill >= :date) AND timestamp <= :date)"
+  "WHERE activetill IS null")
+~*/
 AND nod_id = :nod_id
 
 -- :name get-subnode :? :1
@@ -146,7 +148,7 @@ FROM links
    Rekuperas la ligo de medio
    Params: {:db-type type :env_id ID :date "date-time"} :date is optional - estas nedeviga
 */
-SELECT l.id AS linId
+SELECT l.id AS linid
       , l.name
       , l.type
       , l.version
@@ -161,29 +163,30 @@ SELECT l.id AS linId
             :h2 ", FORMATDATETIME(l.timestamp, 'yyyy-MM-dd HH:mm:ss') AS insertdate"
             :sqlserver ", CONVERT(VARCHAR(25), l.timestamp, 120) AS insertdate")
       ~*/
-      , sn.id AS sId, sn.name AS sourceName, sn.version AS sourceVersion, ssn.id AS ssId, ssn.name AS sourceSubNode, ssn.version AS sourceSubVersion
-      , tn.id AS tId, tn.name AS targetName, tn.version AS targetVersion, tsn.id AS tsId, tsn.name AS targetSubNode, tsn.version AS targetSubVersion
+      , sn.id AS sid, sn.name AS sourceName, sn.version AS sourceVersion, ssn.id AS ssid, ssn.name AS sourceSubNode, ssn.version AS sourceSubVersion,
+        tn.id AS tid, tn.name AS targetName, tn.version AS targetVersion, tsn.id AS tsid, tsn.name AS targetSubNode, tsn.version AS targetSubVersion
 FROM links as l
 LEFT OUTER JOIN sources AS s ON l.id = s.lin_id
-                            AND s.nod_id IN (SELECT MAX(nod_id)
-                                             FROM sources
-                                             --~ (if (contains? params :date) "WHERE timestamp < :date" "WHERE timestamp < CURRENT_TIMESTAMP")
-                                             AND lin_id = s.lin_id
-                                             GROUP BY lin_id)
+                            /*~
+                            (if (contains? params :date)
+                              "AND ((s.activetill IS null OR s.activetill >= :date) AND s.timestamp <= :date)"
+                              "AND s.activetill IS null")
+                            ~*/
 LEFT OUTER JOIN nodes AS sn ON s.nod_id = sn.id
 LEFT OUTER JOIN subnodes AS ssn ON s.sub_id = ssn.id
 LEFT OUTER JOIN targets AS t ON l.id = t.lin_id
-                            AND t.nod_id IN (SELECT MAX(nod_id)
-                                             FROM targets
-                                             --~ (if (contains? params :date) "WHERE timestamp < :date" "WHERE timestamp < CURRENT_TIMESTAMP")
-                                             AND lin_id = t.lin_id
-                                             GROUP BY lin_id)
+                            /*~
+                            (if (contains? params :date)
+                              "AND ((t.activetill IS null OR t.activetill >= :date) AND t.timestamp <= :date)"
+                              "AND t.activetill IS null")
+                            ~*/
 LEFT OUTER JOIN nodes AS tn ON t.nod_id = tn.id
 LEFT OUTER JOIN subnodes AS tsn ON t.sub_id = tsn.id
-WHERE l.id IN (SELECT MAX(id)
-               FROM links
-               --~ (if (contains? params :date) "WHERE timestamp < :date" "WHERE timestamp < CURRENT_TIMESTAMP")
-               GROUP BY name)
+/*~
+(if (contains? params :date)
+  "WHERE ((l.activetill IS null OR l.activetill >= :date) AND l.timestamp <= :date)"
+  "WHERE l.activetill IS null")
+~*/
 AND l.env_id = :env_id
 
 -- :name create-source! :i! :raw
@@ -238,7 +241,27 @@ FROM targets
 */
 SELECT lin_id, nod_id, sub_id
 FROM targets
-WHERE id = :lin_id
+WHERE lin_id = :lin_id
+
+
+-- :name get-source-or-target :?
+/* :doc For developers only
+   Nur por programistoj
+   Params: none
+*/
+SELECT lin_id, nod_id, sub_id
+/*~
+(case (:side params)
+  :source "FROM sources"
+  :target "FROM targets")
+~*/
+WHERE lin_id = :lin_id
+  AND nod_id = :nod_id
+  /*~
+  (if (contains? params :sub_id)
+    "AND sub_id = :sub_id"
+    "AND sub_id IS null")
+  ~*/
 
 
 -- Above queries exposed via the API
@@ -288,6 +311,10 @@ WHERE env_id = :env_id
 AND name = :name
 AND version = :version
 
+
+/*;;;;;;;;;;;
+;;  NODES  ;;
+;;;;;;;;;;;*/
 -- :name get-active-nodes :?
 /* :doc For developers only
    Nur por programistoj
@@ -304,9 +331,9 @@ AND activetill is null
    Nur por programistoj
    Params: {:nod_id (ids)}
 */
-SELECT lin_id, nod_id, sub_id, 'sources' AS side
+SELECT lin_id, nod_id, sub_id
 FROM sources
-WHERE nod_id IN (:v*:nod_ids)
+WHERE nod_id IN (:v*:ids)
 AND activetill is null
 
 -- :name get-active-targets-for-node :?
@@ -314,7 +341,150 @@ AND activetill is null
    Nur por programistoj
    Params: {:nod_id (ids)}
 */
-SELECT lin_id, nod_id, sub_id, 'targets' AS side
+SELECT lin_id, nod_id, sub_id
 FROM targets
-WHERE nod_id IN (:v*:nod_ids)
+WHERE nod_id IN (:v*:ids)
 AND activetill is null
+
+-- :name inactivate-nodes!
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:db-type type :ids (ids)}
+*/
+UPDATE nodes
+/*~
+(case (:db-type params)
+      :h2 "SET activetill = CURRENT_TIMESTAMP"
+      :sqlserver "SET activetill = getdate()")
+~*/
+WHERE id IN (:v*:ids)
+
+/*;;;;;;;;;;;;;;
+;;  SUBNODES  ;;
+;;;;;;;;;;;;;;*/
+-- :name get-active-subnodes :?
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:nod_id id :name "name"}
+*/
+SELECT id
+  FROM subnodes
+WhERE nod_id = :nod_id
+AND name = :name
+AND activetill is null
+
+-- :name get-active-sources-for-subnode :?
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:nod_id (ids)}
+*/
+SELECT lin_id, nod_id, sub_id
+FROM sources
+WHERE sub_id IN (:v*:ids)
+AND activetill is null
+
+-- :name get-active-targets-for-subnode :?
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:nod_id (ids)}
+*/
+SELECT lin_id, nod_id, sub_id
+FROM targets
+WHERE sub_id IN (:v*:ids)
+AND activetill is null
+
+-- :name inactivate-subnodes!
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:db-type type :ids (ids)}
+*/
+UPDATE subnodes
+/*~
+(case (:db-type params)
+      :h2 "SET activetill = CURRENT_TIMESTAMP"
+      :sqlserver "SET activetill = getdate()")
+~*/
+WHERE id IN (:v*:ids)
+
+/*;;;;;;;;;;;
+;;  LINKS  ;;
+;;;;;;;;;;;*/
+-- :name get-active-links :?
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:env_id id :name "name"}
+*/
+SELECT id
+  FROM links
+WhERE env_id = :env_id
+AND name = :name
+AND activetill is null
+
+-- :name get-active-sources-for-link :?
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:nod_id (ids)}
+*/
+SELECT lin_id, nod_id, sub_id
+FROM sources
+WHERE lin_id IN (:v*:ids)
+AND activetill is null
+
+-- :name get-active-targets-for-link :?
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:nod_id (ids)}
+*/
+SELECT lin_id, nod_id, sub_id
+FROM targets
+WHERE lin_id IN (:v*:ids)
+AND activetill is null
+
+-- :name inactivate-links!
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:db-type type :ids (ids)}
+*/
+UPDATE links
+/*~
+(case (:db-type params)
+      :h2 "SET activetill = CURRENT_TIMESTAMP"
+      :sqlserver "SET activetill = getdate()")
+~*/
+WHERE id IN (:v*:ids)
+
+-- :name inactivate-sources!
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:db-type type :ids (ids)}
+*/
+UPDATE sources
+/*~
+(case (:db-type params)
+      :h2 "SET activetill = CURRENT_TIMESTAMP"
+      :sqlserver "SET activetill = getdate()")
+~*/
+/*~
+(case (:id-type params)
+      :link "WHERE lin_id IN (:v*:ids)"
+      :node "WHERE nod_id IN (:v*:ids)"
+      :snod "WHERE sub_id IN (:v*:ids)")
+~*/
+
+-- :name inactivate-targets!
+/* :doc For developers only
+   Nur por programistoj
+   Params: {:db-type type :ids (ids)}
+*/
+UPDATE targets
+/*~
+(case (:db-type params)
+      :h2 "SET activetill = CURRENT_TIMESTAMP"
+      :sqlserver "SET activetill = getdate()")
+~*/
+/*~
+(case (:id-type params)
+      :link "WHERE lin_id IN (:v*:ids)"
+      :node "WHERE nod_id IN (:v*:ids)"
+      :snod "WHERE sub_id IN (:v*:ids)")
+~*/

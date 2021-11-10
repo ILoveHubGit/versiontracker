@@ -10,9 +10,11 @@
     [versiontracker.middleware.formats :as formats]
     [versiontracker.db.data :as vt-data]
     [versiontracker.validation :as vt-vali]
+    [versiontracker.export.pdf :as vt-expo]
     [ring.util.http-response :refer :all]
     [clojure.java.io :as io]
-    [clojure.spec.alpha :as s]))
+    [clojure.spec.alpha :as s]
+    [clojure.tools.logging :as log]))
 
 (defn service-routes []
   ["/api"
@@ -54,11 +56,11 @@
     [""
       {:post {:summary "Add a new environment"
               :parameters {:body ::vt-vali/environment}
-              :responses {200 {:body map?}}
+              :responses {201 {:body map?}}
               :handler (fn [{{:keys [body]} :parameters}]
                         (let [result (vt-data/add-environment! body)]
                           (if (s/valid? int? result)
-                            {:status 200
+                            {:status 201
                              :body {:result (str (:name body) " is added")}}
                             {:status 500
                              :body result})))}
@@ -90,13 +92,16 @@
      :parameters {:path {:env-name ::vt-vali/name}}}
     [""
      {:post {:summary "Add a new node to an environment"
-             :parameters {:body ::vt-vali/node}
-             :responses {200 {:body map?}}
+             :description "Default value for keepVersions is None. This means by default only the last version is kept active."
+             :parameters {:query (s/keys :opt-un [::vt-vali/keepVersions])
+                          :body ::vt-vali/node}
+             :responses {201 {:body map?}}
              :handler (fn [{{{:keys [env-name]} :path
+                             {:keys [keepVersions]} :query
                              :keys [body]} :parameters}]
-                        (let [result (vt-data/add-node! env-name body)]
+                        (let [result (vt-data/add-node! env-name body keepVersions)]
                           (if (s/valid? int? result)
-                            {:status 200
+                            {:status 201
                              :body {:result "Node succesfully added"}}
                             {:status 500
                              :body result})))}
@@ -119,15 +124,16 @@
                           :nod-name ::vt-vali/name}}}
     [""
      {:post {:summary "Add a new subnode to a node"
-             :parameters {:query (s/keys :req-un [::vt-vali/nod-version])
+             :parameters {:query (s/keys :req-un [::vt-vali/nod-version]
+                                         :opt-un [::vt-vali/keepVersions])
                           :body ::vt-vali/subnode}
-             :responses {200 {:body map?}}
+             :responses {201 {:body map?}}
              :handler (fn [{{{:keys [env-name nod-name]} :path
-                             {:keys [nod-version]} :query
+                             {:keys [nod-version keepVersions]} :query
                              :keys [body]} :parameters}]
-                        (let [result (vt-data/add-subnode! env-name nod-name nod-version body)]
+                        (let [result (vt-data/add-subnode! env-name nod-name nod-version body keepVersions)]
                           (if (s/valid? map? result)
-                            {:status 200
+                            {:status 201
                              :body result}
                             {:status 500
                              :body result})))}
@@ -149,13 +155,15 @@
      :parameters {:path {:env-name ::vt-vali/name}}}
     [""
      {:post {:summary "Add a new link"
-             :parameters {:body ::vt-vali/link}
-             :responses {200 {:body map?}}
+             :parameters {:query (s/keys :opt-un [::vt-vali/keepVersions])
+                          :body ::vt-vali/link}
+             :responses {201 {:body map?}}
              :handler (fn [{{{:keys [env-name]} :path
+                             {:keys [keepVersions]} :query
                              :keys [body]} :parameters}]
-                        (let [result (vt-data/add-link! env-name body)]
+                        (let [result (vt-data/add-link! env-name body keepVersions)]
                           (if (s/valid? map? result)
-                            {:status 200
+                            {:status 201
                              :body result}
                             {:status 500
                              :body result})))}
@@ -170,6 +178,15 @@
                             :body result}
                            {:status 500
                             :body result})))}}]
+    ["/:file-name"
+      {:get {:summary "Retrieve links as PDF"
+             :parameters {:query (s/keys :opt-un [::vt-vali/date])}
+             :headers {"Content-Type" "application/pdf"}
+             :handler (fn [{{{:keys [env-name]} :path
+                             {:keys [date]} :query} :parameters}]
+                         (log/info (str "env-name: " env-name " date: " date))
+                         {:status 200
+                          :body (vt-expo/create-pdf env-name date)})}}]
 
 
     ["/:link-name"
@@ -178,26 +195,26 @@
      ["/source"
       {:post {:summary "Add a source"
               :parameters {:body ::vt-vali/source}
-              :responses {200 {:body map?}}
+              :responses {201 {:body map?}}
               :handler (fn [{{{:keys [env-name link-name]} :path
                               {:keys [link-version]} :query
                               :keys [body]} :parameters}]
                          (let [result (vt-data/add-node-to-link! :source env-name link-name link-version body)]
                            (if (s/valid? map? result)
-                             {:status 200
+                             {:status 201
                               :body result}
                              {:status 500
                               :body result})))}}]
      ["/target"
       {:post {:summary "Add a target"
               :parameters {:body ::vt-vali/target}
-              :responses {200 {:body map?}}
+              :responses {201 {:body map?}}
               :handler (fn [{{{:keys [env-name link-name]} :path
                               {:keys [link-version]} :query
                               :keys [body]} :parameters}]
                          (let [result (vt-data/add-node-to-link! :target env-name link-name link-version body)]
                            (if (s/valid? map? result)
-                             {:status 200
+                             {:status 201
                               :body result}
                              {:status 500
                               :body result})))}}]]]])

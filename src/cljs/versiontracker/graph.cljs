@@ -1,6 +1,8 @@
 (ns versiontracker.graph
   (:require [clojure.string :as c-str]))
 
+(def log (.-log js/console))
+
 (declare convert-links)
 
 (defn graph-view
@@ -17,7 +19,7 @@
   [link]
   (let [source (:source link)
         target (:target link)]
-    [{:id (str "I" (:linid link))
+    [{:id (str "I" (:id link))
       :name (:name link)
       :version (:version link)
       :type :link}
@@ -47,38 +49,36 @@
   (when-not (or (nil? (:Node (side node))) (nil? (:SubNode (side node))))
     {:source (str "N" (:id (side node)))
      :target (str "S" (:subid (side node)))
-     :type "ns"
-     :name "function"
-     :version "N/A"}))
+     :type "ns"}))
 
 (defn add-in-link
-  [link]
-  (let [source (:source link)
-        s-node (if (nil? (:SubNode source))
-                 (str "N" (:id source))
-                 (str "S" (:subid source)))
-        target (:target link)
-        t-node (if (nil? (:SubNode target))
-                 (str "N" (:id target))
-                 (str "S" (:subid target)))]
-    (when-not (and (nil? (:Node source))
-                   (nil? (:Node target)))
-      {:source s-node
-       :target t-node
-       :type (:type link)
-       :name (:name link)
-       :version (:version link)})))
+  [side link]
+  (let [node   (side link)
+        nod-id (if (nil? (:SubNode node))
+                 (str "N" (:id node))
+                 (str "S" (:subid node)))
+        intf   (if (= side :source)
+                 :target
+                 :source)]
+    (when (> (count nod-id) 1)
+      {side nod-id
+       intf (str "I" (:id link))
+       :type (:type link)})))
 
 (defn convert-links
   [links]
-  {:nodes
-    (filterv #(not (nil? %))
-      (set
-        (flatten (mapv #(add-nodes %) links))))
+  (when-not (= links "No data")
+   {:nodes
+    (->> links
+        (mapv #(add-nodes %))
+        flatten
+        set
+        (filterv #(not (nil? %))))
     :links
     (filterv #(not (nil? %))
       (set
         (concat
           (mapv #(add-ns-link :source %) links)
           (mapv #(add-ns-link :target %) links)
-          (mapv #(add-in-link %) links))))})
+          (mapv #(add-in-link :source %) links)
+          (mapv #(add-in-link :target %) links))))}))

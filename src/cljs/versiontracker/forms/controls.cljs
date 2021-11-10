@@ -15,13 +15,15 @@
                  true (clojure.string/join \space))}
      (when label [:label.label label])
      [:div.md-form
-      [:input.form-control.form-control-sm
+      [:input.input
        (if (some #(= "disabled" %) field-classes)
-         {:type      "text"
+         {:class (cond->> (or field-classes (list)))
+          :type      "text"
           :value     field-value
           :disabled  field-classes
           :on-change #(rf/dispatch [::forms/set-text-field-value form-id field-path (-> % .-target .-value)])}
-         {:type      "text"
+         {:class (cond->> (or field-classes (list)))
+          :type      "text"
           :value     field-value
           :on-change #(rf/dispatch [::forms/set-text-field-value form-id field-path (-> % .-target .-value)])})]
       (when-not (and (not (nil? field-value)) field-valid? [:div.error validation-error-msg]))]]))
@@ -42,7 +44,7 @@
      [:div.box
       (when label [:b label])
       [:div.md-form
-       [:input.form-control.form-control-sm
+       [:input.input
         {:type      "text"
          :value     field-value
          :on-change #(rf/dispatch [::forms/set-number-field-value form-id field-path (-> % .-target .-value) type])}]]
@@ -65,11 +67,11 @@
   [form-id field-path field-store list e-key e-value
    {:keys [label field-classes] :as options}]
   [:div.field
-   {:class (cond->> (or field-classes (list)))}
    (when label [:label.label label])
    [:div.field-body
     [:div.field
-     [:div.select.is-small.is-info
+     [:div.select
+      {:class (cond->> (or field-classes (list)))}
       [:select
        {:on-change #(rf/dispatch [::forms/set-dropdown-value form-id field-path field-store (-> % .-target .-value) e-key list])}
        (map #(dropdown-list e-key e-value %) list)]]]]])
