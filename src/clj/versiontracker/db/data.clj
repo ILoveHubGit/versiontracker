@@ -20,7 +20,8 @@
    env - Devus esti mapo kun :name (bezonata) kaj :comment (nedeviga)"
   [env]
   (try
-    (let [ret-val (db/create-environment! env)
+    (let [env-emp {:name nil :comment nil}
+          ret-val (db/create-environment! (merge env-emp env))
           env-id  (case (db-type)
                     :h2        (:id (first ret-val))
                     :sqlserver (int (:generated_keys (first ret-val))))]
@@ -106,7 +107,8 @@
     (if (nil? env-id)
         {:result "Environment must exists before adding a node"}
         (try
-          (let [ret-val (db/create-node! (merge {:env_id env-id} node))
+          (let [nod-emp {:name nil :version nil :type nil :deploymentdate nil :comment nil}
+                ret-val (db/create-node! (merge {:env_id env-id} (merge nod-emp node)))
                 nod-id  (case (db-type)
                            :h2        (:id (first ret-val))
                            :sqlserver (int (:generated_keys (first ret-val))))]
@@ -152,7 +154,8 @@
     (if (nil? nod-id)
       {:result "Either Environment or Node does not exist"}
       (try
-        (let [ret-val (db/create-subnode! (merge {:nod_id nod-id} subnode))
+        (let [sno-emp {:name nil :version nil :deploymentdate nil :comment nil}
+              ret-val (db/create-subnode! (merge {:nod_id nod-id} (merge sno-emp subnode)))
               sub-id  (case (db-type)
                         :h2 (:id (first ret-val))
                         :sqlserver (int (:generated_keys (first ret-val))))]
@@ -232,33 +235,6 @@
         (log/info (str "add-source-or-target! | " (cstr/capitalize (name side)) ": " Node " - " Version " / " SubNode " - " SubVersion "successfully addedto the link"))
         {:result (str (cstr/capitalize (name side)) " succesfully added to the link")}))))
 
-; (defn add-target!
-;   "Adds new target to a link in the environment
-;
-;    Aldonas novan celo al ligo en la medio"
-;   [env-id lin-id {:keys [Node Version SubNode SubVersion]}]
-;   (log/info (str "add-target! | Add a target to environment: " env-id " & link: " lin-id))
-;   (let [nod-id  (db-check/exist_node env-id Node Version)
-;         sub-id  (db-check/exist_subnode nod-id SubNode SubVersion)
-;         basepa  (when (seq nod-id)
-;                   {:side :target
-;                    :lin_id lin-id
-;                    :nod_id nod-id})
-;         params  (if (seq sub-id)
-;                   (merge {:sub_id sub-id} basepa)
-;                   basepa)
-;         tar-in  (when-not (seq (db/get-source-or-target params))
-;                   (db/create-target! {:lin_id lin-id
-;                                       :nod_id nod-id
-;                                       :sub_id sub-id}))]
-;     (if (nil? tar-in)
-;       (do
-;         (log/info (str "add-target! | Target-node could not be added; check if the link and node do exist"))
-;         {:result "Target-node could not be added; check if the link and node do exist"})
-;       (do
-;         (log/info (str "add-target! | Target: " Node " - " Version " / " SubNode " - " SubVersion "successfully addedto the link"))
-;         {:result "Target succesfully added to the link"}))))
-
 (defn add-link!
   "Adds new link to an environment
 
@@ -270,7 +246,8 @@
         lin-ids (db/get-active-links {:env_id env-id :name (:name link)})]
     (if (nil? env-id)
       {:result "Environment must exists before adding a link"}
-      (let [lin-id (add-interface! (merge {:env-id env-id} link))]
+      (let [lin-emp {:name nil :version nil :type nil :deploymentdate nil :comment nil}
+            lin-id (add-interface! (merge {:env-id env-id} (merge lin-emp link)))]
         (when (int? lin-id)
           (do
             (log/info (str "add-link! | Link with name: " (:name link) " created with ID: " lin-id " in environment: " env-name))
