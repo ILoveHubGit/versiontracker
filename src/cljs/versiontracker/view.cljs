@@ -47,7 +47,7 @@
 (defn home-page []
   [:section.section
    [:div.columns
-    [:div.column.is-narrow
+    [:div.column.is-narrow {:id "search"}
      [:div.box
       [vt-form/dropdown :environments [:name] [:id]
        (into [] (concat [{:id 0 :name "Choose your environment ..."}] @(rf/subscribe [:environments])))
@@ -69,11 +69,11 @@
       [:div.content
        (when-let [links @(rf/subscribe [:links])]
         [:div
-         [:div.tabs.box
+         [:div.tabs.box {:id "tabs"}
           [:ul
            [:li {:class (when @select-view "is-active")} [:a {:on-click (fn [] (reset! select-view true) (log "Table-view: " @select-view))} "Table View"]]
            [:li {:class (when-not @select-view "is-active")} [:a {:on-click (fn [] (reset! select-view false) (log "Graph-view: " @select-view))} "Graph View"]]]]
-         [:div.box
+         [:div.box {:id "graph"}
            (if @select-view
              (vt-tabl/table-view links select-view)
              (vt-grap/graph-view links select-view))]])]]]]])
