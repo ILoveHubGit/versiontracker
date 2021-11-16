@@ -65,3 +65,32 @@ body {
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
 }
+
+.graph {
+    /* display:block;
+    border:0px solid #ccc; */
+    /* position:absolute;
+    top:6%;
+    left:1%;
+    width:98%;
+    height:90%; */
+    /*background:#0066a1;*/
+		background-color: "#555555";
+    font-family: "sans-serif";
+    font-size: 12px;
+}
+
+.lines line {
+    stroke: #555;
+    stroke-opacity: 0.6;
+}
+
+.nodes text {
+    fill: #fff;
+}
+
+#Node {
+	fill: #666;
+  stroke: #fff;
+  stroke-width: 1.5px;
+}

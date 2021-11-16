@@ -21,12 +21,6 @@
 (def radius (atom 20))
 (def fontsize (atom 12))
 
-(def color (.scaleOrdinal js/d3 (.-schemeCategory20 js/d3)))
-
-(def boxwidth (atom 110))
-(def boxheight (atom 55))
-
-
 (log (str "Initial-Size: " @svg-width " " @svg-height))
 
 (defn append-svg [width height]
@@ -36,6 +30,7 @@
       (.classed "graph" true)
       (.attr "width" width)
       (.attr "height" height)))
+      ; (.attr "style" "background-color:gray")))
 
 (defn remove-svg []
   (-> js/d3
@@ -66,7 +61,7 @@
       (refresh-simulation-force event))
     (recur (<! ch))))
 
-(defn ticked [lines nodes ids versions]
+(defn ticked [lines nodes versions ids]
   (fn tick []
     (reset! svg-width (js/parseInt (-> js/d3
                                        (.select "svg")
@@ -74,51 +69,47 @@
     (reset! svg-height (js/parseInt (-> js/d3
                                         (.select "svg")
                                         (.attr "height"))))
-    (reset! radius (/ @svg-width 10))
-    (reset! fontsize (/ @radius 4))
+    (reset! radius (/ @svg-width 30))
+    (reset! fontsize (/ @radius 3))
     (-> lines
-        ; (.attr "x1" (fn [d] (Math/max (/ @radius 2)
-        ;                               (Math/min (- @svg-width (/ @radius 2))
-        ;                                         1))))
-        ; (.attr "y1" (fn [d] (Math/max (/ @radius 2) (Math/min (- @svg-height (/ @radius 2)) 1))))
-        ; (.attr "x2" (fn [d] (Math/max (/ @radius 2) (Math/min (- @svg-width (/ @radius 2)) 1))))
-        ; (.attr "y2" (fn [d] (Math/max (/ @radius 2) (Math/min (- @svg-height (/ @radius 2)) 1)))))
-        (.attr "x1" (fn [d] (Math/max (/ @radius 2)
-                                      (Math/min (- @svg-width (/ @radius 2))
-                                                (.-x1 d)))))
-        (.attr "y1" (fn [d] (Math/max (/ @radius 2) (Math/min (- @svg-height (/ @radius 2)) (.. d -source -y)))))
-        (.attr "x2" (fn [d] (Math/max (/ @radius 2) (Math/min (- @svg-width (/ @radius 2)) (.. d -target -x)))))
-        (.attr "y2" (fn [d] (Math/max (/ @radius 2) (Math/min (- @svg-height (/ @radius 2)) (.. d -target -y))))))
+        ; (log "d: " (fn [d] (.. d -source -x)))
+        (.attr "x1" (fn [d] (.. d -source -x)))
+        (.attr "y1" (fn [d] (.. d -source -y)))
+        (.attr "x2" (fn [d] (.. d -target -x)))
+        (.attr "y2" (fn [d] (.. d -target -y))))
     (-> nodes
       (.attr "r" @radius)
-      (.attr "cx" (fn [d] (Math/max 0 (Math/min (- @svg-width @radius) (- (.-cx d) (/ @radius 2))))))
-      (.attr "cy" (fn [d] (Math/max 0 (Math/min (- @svg-height @radius) (- (.-cy d) (/ @radius 2)))))))
+      (.attr "cx" (fn [d] (Math/max (* @radius 2) (Math/min (.-x d) (- @svg-width (* @radius 2))))))
+      (.attr "cy" (fn [d] (Math/max (* @radius 2) (Math/min (.-y d) (- @svg-height (* @radius 2)))))))
     (-> ids
       (.attr "font-size" (str @fontsize "px"))
-      (.attr "x" (fn [d] (Math/max 3 (Math/min (- @svg-width (- @radius 3)) (- 1 (/ @radius 2.2))))))
-      (.attr "y" (fn [d] (Math/max @fontsize (Math/min (+ (- @svg-height @radius) @fontsize) (- 1 (- @fontsize 4)))))))
+      (.attr "x" (fn [d] (Math/max (* @radius 1.5) (Math/min (- (.-x d) @fontsize)
+                                                             (- @svg-width (* @radius 2.5))))))
+      (.attr "y" (fn [d] (Math/max (* @radius 2) (Math/min (.-y d)
+                                                           (- @svg-height (* @radius 2)))))))
     (-> versions
       (.attr "font-size" (str @fontsize "px"))
-      (.attr "x" (fn [d] (Math/max 3 (Math/min (- @svg-width (- @radius 3)) (- 1 (/ @radius 2.2))))))
-      (.attr "y" (fn [d] (Math/max (* 2 @fontsize) (Math/min (+ (- @svg-height @radius) (* 2 @fontsize)) (+ 1 4))))))))
+      (.attr "x" (fn [d] (Math/max (* @radius 1.5) (Math/min (- (.-x d) @fontsize)
+                                                             (- @svg-width (* @radius 2.5))))))
+      (.attr "y" (fn [d] (Math/max (* @radius 1.5) (Math/min (+ (.-y d) @fontsize) (- @svg-height (* @radius 1.5)))))))))
 
-(defn simulation [graph defs lines nodes versions ids]
+(defn simulation [graph svg-defs lines nodes versions ids]
   (let [sim
         (-> js/d3
             (.forceSimulation)
             (.force "charge" (-> js/d3
                                  (.forceManyBody)
-                                 (.strength (/ (* @svg-height @svg-width) -3000))))
+                                 (.strength (/ (* @svg-height @svg-width) -5000))))
             (.force "link" (-> js/d3
                                (.forceLink)
-                               (.strength (/ (/ @svg-width @svg-height) 7.5))
+                               (.strength (/ (/ @svg-width @svg-height) 10))
                                (.id (fn [d] (.-id d)))))
             (.force "center" (.forceCenter js/d3
                                            (/ @svg-width 2)
                                            (/ @svg-height 2))))]
     (-> sim
         (.nodes (.-nodes graph))
-        (.on "tick" (ticked lines nodes ids versions)))
+        (.on "tick" (ticked lines nodes versions ids)))
     (-> sim
         (.force "link")
         (.links (.-lines graph)))
@@ -148,76 +139,64 @@
   (drag (.-event js/d3) d idx group))
 
 (defn draw-graph [svg graph]
-  (let [defs     (-> svg
-                     (.append "defs")
-                     (.append "marker")
-                     (.attr "id" "arrow")
-                     (.attr "markerwidth" "4")
-                     (.attr "markerheight" "4")
-                     (.attr "orient" "auto")
-                     (.attr "refY" "2")
-                     (.append "path")
-                     (.attr "d" "M0,0 L4,2 0,4"))
-        conn    (-> svg
-                    (.append "g")
-                    (.attr "class" "links")
-                    (.selectAll "g")
-                    (.data (.-links graph))
-                    (.enter)
-                    (.append "g"))
-        links  (-> conn
-                   (.append "line")
-                   (.attr "stroke-width" (fn [d] (* 3 (.-value d)))))
+  (let [svg-defs    (-> svg
+                        (.append "defs")
+                        (.append "marker")
+                        (.attr "id" "arrow")
+                        (.attr "markerwidth" "4")
+                        (.attr "markerheight" "4")
+                        (.attr "orient" "auto")
+                        (.attr "refY" "2")
+                        (.append "path")
+                        (.attr "d" "M0,0 L4,2 0,4"))
+        conn     (-> svg
+                     (.append "g")
+                     (.attr "class" "lines")
+                     (.selectAll "g")
+                     (.data (.-lines graph))
+                     (.enter)
+                     (.append "g"))
+        lines    (-> conn
+                     (.append "line")
+                     (.attr "stroke-width" 3))
         ltexts  (-> conn
                     (.append "text")
                     (.text (fn [d] (str (.-source d) "->" (.-target d)))))
-        apps    (-> svg
-                    (.append "g")
-                    (.attr "class" "nodes")
-                    (.selectAll "g")
-                    (.data (.-nodes graph))
-                    (.enter)
-                    (.append "g"))
-        nodes   (-> apps
-                    (.append "rect")
-                    (.attr "width" boxwidth)
-                    (.attr "height" boxheight)
-                    (.attr "rx" 5)
-                    (.attr "ry" 5)
-                    (.attr "stroke" (fn [d] (color (.-group d))))
-                    (.attr "fill" (fn [d] (str (.-fill d))))
-                    (.call (-> (.drag js/d3)
-                               (.on "start" drag-dispatcher)
-                               (.on "drag" drag-dispatcher)
-                               (.on "end" drag-dispatcher))))
-        info       (-> apps
-                       (.append "text"))
+        items    (-> svg
+                     (.append "g")
+                     (.attr "class" "nodes")
+                     (.selectAll "g")
+                     (.data (.-nodes graph))
+                     (.enter)
+                     (.append "g"))
+        nodes    (-> items
+                     (.append "circle")
+                     (.attr "id" "Node")
+                     (.attr "cx" 5)
+                     (.attr "cy" 5)
+                     (.attr "r" @radius)
+                     (.attr "stroke" "#aabbcc")
+                     (.attr "fill" "#aabbcc")
+                     (.call (-> (.drag js/d3)
+                                (.on "start" drag-dispatcher)
+                                (.on "drag" drag-dispatcher)
+                                (.on "end" drag-dispatcher))))
+        info     (-> items
+                     (.append "text"))
         versions (-> info
                      (.append "tspan")
-                     (.text (fn [d] (str (.-version d) " - " (.-i d)))))
+                     (.text (fn [d] (str (.-version d)))))
         ids      (-> info
                      (.append "tspan")
                      (.attr "font-weight" "bold")
-                     (.text (fn [d] (.-id d))))
-        idates   (-> info
-                     (.append "tspan")
-                     (.text (fn [d] (.-d d))))]
-    [defs links ltexts nodes versions idates ids]))
-
-(def mydata
-  {
-     :appname "iTest Epics to Applications"
-     :nodes [
-             {:id "CIM" :version "19.6.10" :i "2019-09" :d "CIMAQ4" :group 1 :fill "#ffff00"}
-             {:id "Spider" :version "3.4" :i "2019-09" :d "KT13" :group 2 :fill "#aec700"}]
-     :links [
-             {:source "CIM" :target "Spider" :value 1}]})
-
+                     (.text (fn [d] (.-name d))))]
+    [svg-defs lines nodes versions ids]))
 
 
 (defn graph-view
   [links select-view]
-  (let [window-size (g-sty/getSize (g-dom/getElement "graph"))
+  (let [clinks (convert-links links)
+        window-size (g-sty/getSize (g-dom/getElement "graph"))
         width (.-width window-size)
         height (.-height window-size)
         svg (append-svg width height)
@@ -225,14 +204,14 @@
         data-error (chan 1)
         window-resized-channel (chan (sliding-buffer 5))]
     (handle-window-resize window-resized-channel)
-    (put! data-channel mydata)
+    (put! data-channel clinks)
     (go
       (alt!
         data-error ([err] (throw err))
         data-channel ([data]
                       (log "Links: " (clj->js data))
                       (let [graph (clj->js data)
-                            [defs lines nodes versions ids] (draw-graph svg graph)]
+                            [svg-defs lines nodes versions ids] (draw-graph svg graph)]
                         (reset! svg-width (js/parseInt (-> js/d3
                                                            (.select "svg")
                                                            (.attr "width"))))
@@ -240,13 +219,12 @@
                                                             (.select "svg")
                                                             (.attr "height"))))
                         (swap! app-state
-                               assoc :simulation (simulation graph defs lines nodes versions ids)))))
-      (close! data-error)
-      (close! data-channel))))
-    ; [:div {:hidden @select-view}
-    ;  [:div "Nodes: " (str (:nodes data))]
-    ;  [:br]
-    ;  [:div "Links: " (str (:lines data))]]))
+                               assoc :simulation (simulation graph svg-defs lines nodes versions ids))))))
+
+    [:div {:hidden @select-view}]))
+     ; [:div "Nodes: " (str (:nodes clinks))]
+     ; [:br]
+     ; [:div "Links: " (str (:lines clinks))]]))
           ; [:br]
           ; [:div "All: " (str defs lines nodes versions ids)]]))))
 
