@@ -71,9 +71,11 @@
                                (when (= 1 nr-ids)
                                  (auto-enter-links k-id v-id ids :source-func source-func
                                                                  :target-func target-func))
-                               (id-func {:db-type (db-type) :ids [(last nods)]})
-                               (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids [(last nods)]})
-                               (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids [(last nods)]})
+                               ;; Only neede to call the inactivation functions if there is at least one to be deactivated
+                               (when (> (count (last nods)) 0)
+                                 (id-func {:db-type (db-type) :ids [(last nods)]})
+                                 (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids [(last nods)]})
+                                 (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids [(last nods)]}))
                                ;; If there were more than 1 old link we first remove the oldest before creating the new link
                                (when-not (= 1 nr-ids)
                                  (auto-enter-links k-id v-id ids :source-func source-func
@@ -90,9 +92,10 @@
                              ;; If none to be kept, make the link to the new node before removing them
                              (auto-enter-links k-id v-id [(last ids)] :source-func source-func
                                                                       :target-func target-func)
-                             (id-func {:db-type (db-type) :ids nods})
-                             (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids nods})
-                             (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids nods}))))))
+                             (when (> (count nods) 0)
+                               (id-func {:db-type (db-type) :ids nods})
+                               (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids nods})
+                               (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids nods})))))))
 
 
 ;; Nodes
