@@ -80,9 +80,10 @@
                                                                  :target-func target-func))))
             "Last"         (do
                              ;; If there is only one old link keep it
-                             (id-func {:db-type (db-type) :ids (if (= 1 (count nods)) nods (rest nods))})
-                             (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids (rest nods)})
-                             (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids (rest nods)})
+                             (when (> (count nods) 1)
+                              (id-func {:db-type (db-type) :ids (rest nods)})
+                              (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids (rest nods)})
+                              (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids (rest nods)}))
                              (auto-enter-links k-id v-id ids :source-func source-func
                                                              :target-func target-func))
             "None"         (do
