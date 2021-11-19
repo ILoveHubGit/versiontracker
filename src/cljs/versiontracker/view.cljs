@@ -78,7 +78,9 @@
              (do
                (vt-grap/remove-svg)
                (vt-tabl/table-view links select-view))
-             (vt-grap/graph-view links select-view))]])]]])
+             (do
+               (vt-grap/remove-svg)
+               (vt-grap/graph-view links select-view)))]])]]])
 
 
 (defn root-component []

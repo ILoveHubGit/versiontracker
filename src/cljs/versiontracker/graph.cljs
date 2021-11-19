@@ -18,13 +18,18 @@
 
 (def svg-width (atom 100))
 (def svg-height (atom 100))
-(def radius (atom 20))
-(def fontsize (atom 12))
+(def radius (atom (/ @svg-width 50)))
+
+(defn remove-svg []
+  (-> js/d3
+      (.selectAll "#graph svg")
+      (.remove)))
 
 (defn reset-svg-size! []
   (do
-    (reset! svg-width (.-width (g-sty/getSize (g-dom/getElement "graph"))))
-    (reset! svg-height (- (.-height (g-dom/getViewportSize (g-dom/getWindow))) (.-y (g-sty/getPosition (g-dom/getElement "graph")))))))
+    (reset! svg-width (.-width (g-sty/getTransformedSize (g-dom/getElement "graph"))))
+    (reset! svg-height (- (.-height (g-dom/getViewportSize (g-dom/getWindow))) (.-y (g-sty/getPosition (g-dom/getElement "graph")))))
+    (reset! radius (/ @svg-width 50))))
 
 (defn append-svg [width height]
   (-> js/d3
@@ -35,16 +40,9 @@
       (.attr "height" height)))
       ; (.attr "style" "background-color:gray")))
 
-(defn remove-svg []
-  (-> js/d3
-      (.selectAll "#graph svg")
-      (.remove)))
-
 (defn refresh-simulation-force [event]
   (let [sim (:simulation @app-state)]
     (reset-svg-size!)
-    (reset! radius (/ @svg-width 50))
-    (reset! fontsize (/ @radius 2.5))
     (.force sim "center" (.forceCenter js/d3 (/ @svg-width 2) (/ @svg-height 2)))
     (-> sim
         (.alphaTarget 0.1)
@@ -88,15 +86,15 @@
       ; (.attr "cx" (fn [d] (Math/max (* @radius 2) (Math/min (.-x d) (- @svg-width (* @radius 2))))))
       ; (.attr "cy" (fn [d] (Math/max (* @radius 2) (Math/min (.-y d) (- @svg-height (* @radius 2)))))))
     (-> ids
-      (.attr "x" (fn [d] (- (.-x d) 20)))
+      (.attr "x" (fn [d] (- (.-x d) (/ @radius 2))))
       ; (.attr "x" (fn [d] (Math/max (* @radius 1.5) (Math/min (- (.-x d) 20)
       ;                                                        (- @svg-width (* @radius 2.5))))))
-      (.attr "y" (fn [d] (- (.-y d) 5))))
+      (.attr "y" (fn [d] (- (.-y d) 3))))
       ; (.attr "y" (fn [d] (Math/max (* @radius 2) (Math/min (- (.-y d) 6)
       ;                                                      (- @svg-height (* @radius 2)))))))
     (-> versions
-      (.attr "x" (fn [d] (- (.-x d) 20)))
-      (.attr "y" (fn [d] (+ (.-y d) 5))))))
+      (.attr "x" (fn [d] (- (.-x d) (/ @radius 2))))
+      (.attr "y" (fn [d] (+ (.-y d) 7))))))
       ; (.attr "x" (fn [d] (Math/max (* @radius 1.5) (Math/min (- (.-x d) 20)
       ;                                                        (- @svg-width (* @radius 2.5))))))
       ; (.attr "y" (fn [d] (Math/max (* @radius 2.3) (Math/min (+ (.-y d) 6) (- @svg-height (* @radius 1.7)))))))))
@@ -115,7 +113,7 @@
                                     (.radius (fn [d] (.-radius d)))))
             (.force "link" (-> js/d3
                                (.forceLink)
-                               (.strength 0.2)
+                               (.strength 0.1)
                                (.id (fn [d] (.-id d)))))
             (.force "center" (.forceCenter js/d3
                                            (/ @svg-width 2)
@@ -171,7 +169,8 @@
                      (.append "g"))
         lines    (-> conn
                      (.append "line")
-                     (.attr "stroke-width" 3))
+                     (.attr "stroke-width" 2))
+                     ; (.attr "marker-end" "url(#arrow)"))
         items    (-> svg
                      (.append "g")
                      (.attr "class" "nodes")
@@ -198,11 +197,11 @@
                      (.append "text"))
         versions (-> info
                      (.append "tspan")
-                     (.attr "font-size" "1rem")
+                     (.attr "font-size" "0.8rem")
                      (.text (fn [d] (str (.-version d)))))
         ids      (-> info
                      (.append "tspan")
-                     (.attr "font-size" "1rem")
+                     (.attr "font-size" "0.8rem")
                      (.attr "font-weight" "bold")
                      (.text (fn [d] (.-name d))))]
     [svg-defs lines nodes versions ids]))
@@ -211,13 +210,12 @@
 (defn graph-view
   [links select-view]
   (let [clinks (convert-links links)
-        window-size (g-sty/getSize (g-dom/getElement "graph"))
-        width (.-width window-size)
-        height (.-height window-size)
-        svg (append-svg width height)
+        size reset-svg-size!
+        svg (append-svg @svg-width @svg-height)
         data-channel (chan 1)
         data-error (chan 1)
         window-resized-channel (chan (sliding-buffer 5))]
+    (log (str "Size: " @svg-width "-" @svg-height))
     (handle-window-resize window-resized-channel)
     (put! data-channel clinks)
     (go

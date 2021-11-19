@@ -232,32 +232,6 @@
         (log/info (str "add-source-or-target! | " (cstr/capitalize (name side)) ": " Node " - " Version " / " SubNode " - " SubVersion "successfully addedto the link"))
         {:result (str (cstr/capitalize (name side)) " succesfully added to the link")}))))
 
-; (defn add-target!
-;   "Adds new target to a link in the environment
-;
-;    Aldonas novan celo al ligo en la medio"
-;   [env-id lin-id {:keys [Node Version SubNode SubVersion]}]
-;   (log/info (str "add-target! | Add a target to environment: " env-id " & link: " lin-id))
-;   (let [nod-id  (db-check/exist_node env-id Node Version)
-;         sub-id  (db-check/exist_subnode nod-id SubNode SubVersion)
-;         basepa  (when (seq nod-id)
-;                   {:side :target
-;                    :lin_id lin-id
-;                    :nod_id nod-id})
-;         params  (if (seq sub-id)
-;                   (merge {:sub_id sub-id} basepa)
-;                   basepa)
-;         tar-in  (when-not (seq (db/get-source-or-target params))
-;                   (db/create-target! {:lin_id lin-id
-;                                       :nod_id nod-id
-;                                       :sub_id sub-id}))]
-;     (if (nil? tar-in)
-;       (do
-;         (log/info (str "add-target! | Target-node could not be added; check if the link and node do exist"))
-;         {:result "Target-node could not be added; check if the link and node do exist"})
-;       (do
-;         (log/info (str "add-target! | Target: " Node " - " Version " / " SubNode " - " SubVersion "successfully addedto the link"))
-;         {:result "Target succesfully added to the link"}))))
 
 (defn add-link!
   "Adds new link to an environment
