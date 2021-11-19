@@ -66,7 +66,7 @@ body {
   transform: translateY(-50%);
 }
 
-.graph {
+svg.graph {
     /* display:block;
     border:0px solid #ccc; */
     /* position:absolute;
@@ -86,11 +86,23 @@ body {
 }
 
 .nodes text {
-    fill: #fff;
+    fill: #333;
 }
 
-#Node {
-	fill: #666;
-  stroke: #fff;
+circle.Node {
+	fill: #B39DDB;
+  stroke: #777;
+  stroke-width: 2.5px;
+}
+
+circle.SubNode {
+	fill: #81D4FA;
+  stroke: #777;
+  stroke-width: 2.5px;
+}
+
+circle.Interface {
+	fill: #80CBC4;
+  stroke: #777;
   stroke-width: 1.5px;
 }

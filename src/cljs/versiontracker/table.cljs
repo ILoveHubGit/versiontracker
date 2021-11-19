@@ -21,28 +21,27 @@
 
 (defn table-view
   [links select-view]
-  [:div {:hidden (not @select-view)}
-   (if (= links "No data")
-     [:div "No data available for this environment"]
-     [:div.table-container
-      [:table.table.is-bordered.is-striped.is-narrow.is-hoverable
-       [:thead
-        [:tr.color-blue
-         [:th.has-text-centered.has-text-white {:colSpan 4} "Source"]
-         [:th.has-text-centered.has-text-white {:colSpan 4} "Interface"]
-         [:th.has-text-centered.has-text-white {:colSpan 4} "Target"]]
-        [:tr.color-blue
-         [:th.has-text-white "Node"]
-         [:th.has-text-white "Version"]
-         [:th.has-text-white "Sub Node"]
-         [:th.has-text-white "Sub Version"]
-         [:th.has-text-white "Interface"]
-         [:th.has-text-white "Version"]
-         [:th.has-text-white "Type"]
-         [:th.has-text-white "Date"]
-         [:th.has-text-white "Node"]
-         [:th.has-text-white "Version"]
-         [:th.has-text-white "Sub Node"]
-         [:th.has-text-white "Sub Version"]]]
-       [:tbody
-        (map #(make-row %) links)]]])])
+  (if (= links "No data")
+    [:div "No data available for this environment"]
+    [:div.table-container
+     [:table.table.is-bordered.is-striped.is-narrow.is-hoverable.is-fullwidth
+      [:thead
+       [:tr.color-blue
+        [:th.has-text-centered.has-text-white {:colSpan 4} "Source"]
+        [:th.has-text-centered.has-text-white {:colSpan 4} "Interface"]
+        [:th.has-text-centered.has-text-white {:colSpan 4} "Target"]]
+       [:tr.color-blue
+        [:th.has-text-white "Node"]
+        [:th.has-text-white "Version"]
+        [:th.has-text-white "Sub Node"]
+        [:th.has-text-white "Sub Version"]
+        [:th.has-text-white "Interface"]
+        [:th.has-text-white "Version"]
+        [:th.has-text-white "Type"]
+        [:th.has-text-white "Date"]
+        [:th.has-text-white "Node"]
+        [:th.has-text-white "Version"]
+        [:th.has-text-white "Sub Node"]
+        [:th.has-text-white "Sub Version"]]]
+      [:tbody
+       (map #(make-row %) links)]]]))

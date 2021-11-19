@@ -65,18 +65,20 @@
                        (= "No data" @(rf/subscribe [:links])))
           [:div [:a {:href @(rf/subscribe [:ret-pdf]) :target "_blank"} [:button.button.is-info "PDF"]]])]]]]
     [:div.column
-     [:div.container
-      [:div.content
+     ; [:div.container
+     ;  [:div.content
        (when-let [links @(rf/subscribe [:links])]
-        [:div
-         [:div.tabs.box {:id "tabs"}
+        [:div.box
+         [:div.tabs {:id "tabs"}
           [:ul
            [:li {:class (when @select-view "is-active")} [:a {:on-click (fn [] (reset! select-view true) (log "Table-view: " @select-view))} "Table View"]]
            [:li {:class (when-not @select-view "is-active")} [:a {:on-click (fn [] (reset! select-view false) (log "Graph-view: " @select-view))} "Graph View"]]]]
-         [:div.box {:id "graph"}
+         [:div {:id "graph"}
            (if @select-view
-             (vt-tabl/table-view links select-view)
-             (vt-grap/graph-view links select-view))]])]]]]])
+             (do
+               (vt-grap/remove-svg)
+               (vt-tabl/table-view links select-view))
+             (vt-grap/graph-view links select-view))]])]]])
 
 
 (defn root-component []
