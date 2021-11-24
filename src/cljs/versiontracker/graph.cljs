@@ -1,12 +1,13 @@
 (ns versiontracker.graph
-  (:require [clojure.string :as c-str]
-            [cljsjs.d3]
+  (:require [cljsjs.d3]
             [cljs.core.async :refer [<! alt! chan close! go go-loop put! sliding-buffer]]
             [goog.dom :as g-dom]
             [goog.style :as g-sty]
             [goog.events :as g-eve]
             [goog.events.EventType :as EventType]
-            [clojure.walk]))
+            [clojure.walk]
+            [re-frame.core :as rf]))
+
 
 (enable-console-print!)
 (def log (.-log js/console))
@@ -16,9 +17,15 @@
 (def app-state
   (atom {:simulation nil}))
 
+(def window-resized-channel (chan (sliding-buffer 5)))
+
 (def svg-width (atom 100))
 (def svg-height (atom 100))
 (def radius (atom (/ @svg-width 50)))
+
+(def link-strength 1)
+(def charge-strength -2)
+(def charge-distance (atom 10))
 
 (defn remove-svg []
   (-> js/d3
@@ -27,9 +34,11 @@
 
 (defn reset-svg-size! []
   (do
-    (reset! svg-width (.-width (g-sty/getTransformedSize (g-dom/getElement "graph"))))
+    (reset! svg-width (min (.-width (g-dom/getViewportSize (g-dom/getWindow))) (.-width (g-sty/getTransformedSize (g-dom/getElement "graph")))))
     (reset! svg-height (- (.-height (g-dom/getViewportSize (g-dom/getWindow))) (.-y (g-sty/getPosition (g-dom/getElement "graph")))))
-    (reset! radius (/ @svg-width 50))))
+    (reset! radius (/ @svg-width 50))
+    (reset! charge-distance @svg-width)
+    (log "RSS-Size: " @svg-width " - " @svg-height " - " @radius)))
 
 (defn append-svg [width height]
   (-> js/d3
@@ -43,20 +52,22 @@
 (defn refresh-simulation-force [event]
   (let [sim (:simulation @app-state)]
     (reset-svg-size!)
-    (.force sim "center" (.forceCenter js/d3 (/ @svg-width 2) (/ @svg-height 2)))
+    (.force sim "center" (.forceCenter js/d3
+                                       (/ @svg-width 2)
+                                       (/ @svg-height 2)))
     (-> sim
         (.alphaTarget 0.1)
         (.restart))))
 
-(defn handle-window-resize [ch]
+(defn handle-window-resize []
   ;;subscribe to window.resize
   (g-eve/listen js/window
                  EventType/RESIZE
                  (fn [event]
-                   (put! ch event)))
+                   (put! window-resized-channel event)))
   ;; handle resize
   (go-loop []
-    (let [event (<! ch)]
+    (let [event (<! window-resized-channel)]
       (when event
         (refresh-simulation-force event)))
     (recur)))
@@ -67,15 +78,10 @@
         (.attr "width" @svg-width)
         (.attr "height" @svg-height))
     (-> lines
-        ; (log "d: " (fn [d] (.. d -source -x)))
         (.attr "x1" (fn [d] (.. d -source -x)))
         (.attr "y1" (fn [d] (.. d -source -y)))
         (.attr "x2" (fn [d] (.. d -target -x)))
         (.attr "y2" (fn [d] (.. d -target -y))))
-        ; (.attr "x1" (fn [d] (Math/max (* @radius 2) (Math/min (.. d -source -x) (- @svg-width (* @radius 2))))))
-        ; (.attr "y1" (fn [d] (Math/max (* @radius 2) (Math/min (.. d -source -y) (- @svg-height (* @radius 2))))))
-        ; (.attr "x2" (fn [d] (Math/max (* @radius 2) (Math/min (.. d -target -x) (- @svg-width (* @radius 2))))))
-        ; (.attr "y2" (fn [d] (Math/max (* @radius 2) (Math/min (.. d -target -y) (- @svg-height (* @radius 2)))))))
     (-> nodes
       (.attr "r" (fn [d] (case (str (first (.-id d)))
                                "I" (* 0.8 @radius)
@@ -83,21 +89,12 @@
                                "S" @radius)))
       (.attr "cx" (fn [d] (.-x d)))
       (.attr "cy" (fn [d] (.-y d))))
-      ; (.attr "cx" (fn [d] (Math/max (* @radius 2) (Math/min (.-x d) (- @svg-width (* @radius 2))))))
-      ; (.attr "cy" (fn [d] (Math/max (* @radius 2) (Math/min (.-y d) (- @svg-height (* @radius 2)))))))
     (-> ids
       (.attr "x" (fn [d] (- (.-x d) (/ @radius 2))))
-      ; (.attr "x" (fn [d] (Math/max (* @radius 1.5) (Math/min (- (.-x d) 20)
-      ;                                                        (- @svg-width (* @radius 2.5))))))
       (.attr "y" (fn [d] (- (.-y d) 3))))
-      ; (.attr "y" (fn [d] (Math/max (* @radius 2) (Math/min (- (.-y d) 6)
-      ;                                                      (- @svg-height (* @radius 2)))))))
     (-> versions
       (.attr "x" (fn [d] (- (.-x d) (/ @radius 2))))
       (.attr "y" (fn [d] (+ (.-y d) 7))))))
-      ; (.attr "x" (fn [d] (Math/max (* @radius 1.5) (Math/min (- (.-x d) 20)
-      ;                                                        (- @svg-width (* @radius 2.5))))))
-      ; (.attr "y" (fn [d] (Math/max (* @radius 2.3) (Math/min (+ (.-y d) 6) (- @svg-height (* @radius 1.7)))))))))
 
 (defn simulation [graph svg svg-defs lines nodes versions ids]
   (let [sim
@@ -105,15 +102,15 @@
             (.forceSimulation)
             (.force "charge" (-> js/d3
                                  (.forceManyBody)
-                                 (.strength (/ @svg-width -8))
-                                 (.theta 0.5)
-                                 (.distanceMax @svg-width)))
+                                 (.strength (/ @svg-width charge-strength))
+                                 ; ; (.theta 0.5)
+                                 (.distanceMax @charge-distance)))
             (.force "collision" (-> js/d3
                                     (.forceCollide)
                                     (.radius (fn [d] (.-radius d)))))
             (.force "link" (-> js/d3
                                (.forceLink)
-                               (.strength 0.1)
+                               (.strength link-strength)
                                (.id (fn [d] (.-id d)))))
             (.force "center" (.forceCenter js/d3
                                            (/ @svg-width 2)
@@ -126,28 +123,35 @@
         (.links (.-lines graph)))
     sim))
 
-(defmulti drag (fn [event d idx group] (.-type event)))
+; (defmulti drag (fn [event d idx group] (.-type event)))
+(defmulti drag (fn [event d] (.-type event)))
 
-(defmethod drag "start" [event d idx group]
+; (defmethod drag "start" [event d idx group])
+(defmethod drag "start" [event d]
   (if (zero? (.-active event))
     (-> (:simulation @app-state)
-        (.alphaTarget 0.1)
+        (.alphaTarget 0.3)
         (.restart))))
 
-(defmethod drag "drag" [event d idx group]
+; (defmethod drag "drag" [event d idx group])
+(defmethod drag "drag" [event d]
   (set! (.-x d) (.-x event))
   (set! (.-y d) (.-y event)))
 
-(defmethod drag "end" [event d idx group]
+; (defmethod drag "end" [event d idx group])
+(defmethod drag "end" [event d]
   (if (zero? (.-active event))
     (.alphaTarget (:simulation @app-state) 0))
   (set! (.-x d) nil)
   (set! (.-y d) nil))
 
-(defmethod drag :default [event d idx group] nil)
+; (defmethod drag :default [event d idx group] nil)
+(defmethod drag :default [event d] nil)
 
-(defn drag-dispatcher [d idx group]
-  (drag (.-event js/d3) d idx group))
+; (defn drag-dispatcher [d idx group]
+;   (drag (.-event js/d3) d idx group))
+(defn drag-dispatcher [d]
+  (drag (.-event js/d3) d))
 
 (defn draw-graph [svg graph]
   (let [svg-defs    (-> svg
@@ -208,15 +212,17 @@
 
 
 (defn graph-view
-  [links select-view]
-  (let [clinks (convert-links links)
-        size reset-svg-size!
+  [select-view]
+  (let [clinks (convert-links @(rf/subscribe [:links]))
+        size (reset-svg-size!)
         svg (append-svg @svg-width @svg-height)
         data-channel (chan 1)
-        data-error (chan 1)
-        window-resized-channel (chan (sliding-buffer 5))]
-    (log (str "Size: " @svg-width "-" @svg-height))
-    (handle-window-resize window-resized-channel)
+        data-error (chan 1)]
+        ; window-resized-channel (chan (sliding-buffer 5))]
+    ; (log "GV-Size: " @svg-width " - " @svg-height " - " @radius)
+    ; (log (str "Size: " @svg-width "-" @svg-height))
+    (handle-window-resize)
+    ; (handle-window-resize window-resized-channel)
     (put! data-channel clinks)
     (go
       (alt!
@@ -226,6 +232,7 @@
                       (let [graph (clj->js data)
                             [svg-defs lines nodes versions ids] (draw-graph svg graph)]
                         reset-svg-size!
+                        ; (log "GV2-Size: " @svg-width " - " @svg-height " - " @radius)
                         (swap! app-state
                                assoc :simulation (simulation graph svg svg-defs lines nodes versions ids)))))
       (close! data-error)

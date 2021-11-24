@@ -52,6 +52,28 @@
   (fn [db _]
     (:ret-pdf db)))
 
+(rf/reg-sub
+  :window-width
+  (fn [db _]
+    (:window-width db)))
+
+(rf/reg-sub
+  :window-height
+  (fn [db _]
+    (:window-height db)))
+
+(rf/reg-event-fx
+ :window-width
+ (fn [{:keys [db]} [_ width]]
+   {:db (-> db
+            (assoc-in [:test-data :width] width))}))
+
+(rf/reg-event-fx
+ :window-height
+ (fn [{:keys [db]} [_ width]]
+   {:db (-> db
+            (assoc-in [:test-data :height] width))}))
+
 (kf/reg-chain
   :ret-links
   (fn [{:keys [db]}]
@@ -90,7 +112,7 @@
     (if (seq links)
       {:db (assoc db :links (sort-by :name links))}
       {:db (assoc db :links "No data")})))
-      
+
 
 
 (kf/reg-chain
