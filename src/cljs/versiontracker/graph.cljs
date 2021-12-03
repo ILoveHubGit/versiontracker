@@ -108,11 +108,11 @@
           (.attr "y2" (fn [d] (.. d -target -y))))
       (-> nodes
         (.attr "r" (fn [d] (case (str (first (.-id d)))
-                                 "I" (* 0.8 actrad)
-                                 "N" (* 1.2 actrad)
-                                 "S" actrad)))
-        (.attr "cx" (fn [d] (Math/max (* 1.2 actrad) (Math/min (get-svg-width) (.-x d)))))
-        (.attr "cy" (fn [d] (Math/max (* 1.2 actrad) (Math/min (get-svg-height) (.-y d))))))
+                                 "I" (* 0.6 actrad)
+                                 "N" (* 1.0 actrad)
+                                 "S" (* 0.8 actrad))))
+        (.attr "cx" (fn [d] (Math/max (* 1.0 actrad) (Math/min (get-svg-width) (.-x d)))))
+        (.attr "cy" (fn [d] (Math/max (* 1.0 actrad) (Math/min (get-svg-height) (.-y d))))))
       (-> ids
         (.attr "x" (fn [d] (- (.-x d) (/ actrad 2))))
         (.attr "y" (fn [d] (- (.-y d) 3))))
@@ -126,7 +126,7 @@
             (.forceSimulation)
             (.force "charge" (-> js/d3
                                  (.forceManyBody)
-                                 (.strength -50)
+                                 (.strength -40)
             ; ;                      ; ; ; (.theta 0.5)
                                  (.distanceMax @charge-distance)))
             (.force "link" (-> js/d3
@@ -228,11 +228,11 @@
                      (.append "text"))
         versions (-> info
                      (.append "tspan")
-                     (.attr "font-size" "0.6rem")
+                     (.attr "font-size" "1rem")
                      (.text (fn [d] (str (.-version d)))))
         ids      (-> info
                      (.append "tspan")
-                     (.attr "font-size" "0.6rem")
+                     (.attr "font-size" "1rem")
                      (.attr "font-weight" "bold")
                      (.text (fn [d] (.-name d))))]
     [svg-defs lines nodes versions ids]))

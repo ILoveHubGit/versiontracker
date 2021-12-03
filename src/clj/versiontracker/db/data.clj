@@ -214,16 +214,16 @@
                    :lin_id lin-id
                    :nod_id nod-id})
         params  (if (int? sub-id)
-                  (merge {:sub_id sub-id} basepa)
-                  basepa)
+                  (merge {:sub_id sub-id} basepa
+                    basepa))
         soutar  (when-not (seq (db/get-source-or-target params))
                   (case side
                         :source (db/create-source! {:lin_id lin-id
                                                     :nod_id nod-id
                                                     :sub_id sub-id})
-                        :target (db/create-target! {:lin_id lin-id
-                                                    :nod_id nod-id
-                                                    :sub_id sub-id})))]
+                        :target (db/create-target! {:lin_id lin-id}
+                                             :nod_id nod-id
+                                             :sub_id sub-id)))]
     (if (nil? soutar)
       (do
         (log/info (str "add-source-or-target! | " (cstr/capitalize (name side)) "-node could not be added; check if the link and node do exist"))
