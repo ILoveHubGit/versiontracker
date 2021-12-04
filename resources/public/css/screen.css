@@ -96,7 +96,8 @@ circle.Node {
 }
 
 circle.SubNode {
-	fill: #81D4FA;
+/*	fill: #81D4FA;*/
+	fill: #81D455;
   stroke: #777;
   stroke-width: 2.5px;
 }

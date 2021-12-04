@@ -17,16 +17,10 @@
 (def app-state
   (atom {:simulation nil}))
 
-; (def window-resized-channel (chan (sliding-buffer 2)))
 (def window-resized-channel (chan 1))
 
-(def svg-width (atom 1000))
-(def svg-height (atom 600))
-(def radius (atom (/ @svg-width 50)))
-
-(def link-strength (atom 1))
-(def charge-strength (atom -50))
-(def charge-distance (atom 10))
+(def svg-width 1000)
+(def svg-height 600)
 
 (defn remove-svg []
   (-> js/d3
@@ -36,25 +30,18 @@
 (defn get-svg-width []
   (let [width (min (.-width (g-dom/getViewportSize (g-dom/getWindow))) (.-width (g-sty/getTransformedSize (g-dom/getElement "graph"))))]
     ; (log "Width: " width)
-    width))
+    (Math/max width svg-width)))
 
 (defn get-svg-height []
   (let [height (- (.-height (g-dom/getViewportSize (g-dom/getWindow))) (.-y (g-sty/getPosition (g-dom/getElement "graph"))))]
     ; (log "Height: " height)
-    height))
+    (Math/max height svg-height)))
 
 (defn get-radius []
   (let [radius (/ (get-svg-width) 40)]
     ; (log "Radius: " radius)
     radius))
 
-(defn reset-svg-size! []
-  (do
-    (reset! svg-width (get-svg-width))
-    (reset! svg-height (get-svg-height))
-    (reset! charge-strength (/ @svg-width -50))
-    (reset! charge-distance (/ @svg-width 2))
-    (reset! link-strength (/ @svg-width 750))))
 
 (defn append-svg []
   (let [width (get-svg-width)
@@ -71,10 +58,10 @@
 
 (defn refresh-simulation-force []
   (let [sim (:simulation @app-state)]
-    (reset-svg-size!)
+    ; (reset-svg-size!)
     (.force sim "center" (.forceCenter js/d3
-                                       (/ (get-svg-width) 2)
-                                       (/ (get-svg-height) 2)))
+                                       (/ (Math/max (get-svg-width) svg-width) 2)
+                                       (/ (Math/max (get-svg-height) svg-height) 2)))
     (-> sim
         (.alphaTarget 0.1)
         (.restart))))
@@ -114,11 +101,15 @@
         (.attr "cx" (fn [d] (Math/max (* 1.2 actrad) (Math/min (get-svg-width) (.-x d)))))
         (.attr "cy" (fn [d] (Math/max (* 1.2 actrad) (Math/min (get-svg-height) (.-y d))))))
       (-> ids
-        (.attr "x" (fn [d] (- (.-x d) (/ actrad 2))))
-        (.attr "y" (fn [d] (- (.-y d) 3))))
+        (.attr "x" (fn [d] (- (Math/max (* 1.2 actrad) (Math/min (get-svg-width) (.-x d))) (/ actrad 2))))
+        (.attr "y" (fn [d] (- (Math/max (* 1.2 actrad) (Math/min (get-svg-height) (.-y d))) 3))))
+        ; (.attr "x" (fn [d] (- (.-x d) (/ actrad 2))))
+        ; (.attr "y" (fn [d] (- (.-y d) 3))))
       (-> versions
-        (.attr "x" (fn [d] (- (.-x d) (/ actrad 2))))
-        (.attr "y" (fn [d] (+ (.-y d) 7)))))))
+        (.attr "x" (fn [d] (- (Math/max (* 1.2 actrad) (Math/min (get-svg-width) (.-x d))) (/ actrad 2))))
+        (.attr "y" (fn [d] (+  (Math/max (* 1.2 actrad) (Math/min (get-svg-height) (.-y d))) 7)))))))
+        ; (.attr "x" (fn [d] (- (.-x d) (/ actrad 2))))
+        ; (.attr "y" (fn [d] (+ (.-y d) 7)))))))
 
 (defn simulation [graph svg svg-defs lines nodes versions ids]
   (let [sim
@@ -126,12 +117,12 @@
             (.forceSimulation)
             (.force "charge" (-> js/d3
                                  (.forceManyBody)
-                                 (.strength -50)
+                                 (.strength -50)))
             ; ;                      ; ; ; (.theta 0.5)
-                                 (.distanceMax @charge-distance)))
+                                 ; (.distanceMax 75)))
             (.force "link" (-> js/d3
                                (.forceLink)
-                               (.strength @link-strength)
+                               (.strength 1.5)
                                (.id (fn [d] (.-id d)))))
             (.force "center" (.forceCenter js/d3
                                            (/ (get-svg-width) 2)
@@ -254,7 +245,7 @@
                       ; (log "Links: " (clj->js data))
                       (let [graph (clj->js data)
                             [svg-defs lines nodes versions ids] (draw-graph svg graph)]
-                        (reset-svg-size!)
+                        ; (reset-svg-size!)
                         (log "GV2-Size: " (get-svg-width) " - " (get-svg-height) " - " (get-radius))
                         (swap! app-state
                                assoc :simulation (simulation graph svg svg-defs lines nodes versions ids)))))
