@@ -60,8 +60,8 @@
   (let [sim (:simulation @app-state)]
     ; (reset-svg-size!)
     (.force sim "center" (.forceCenter js/d3
-                                       (/ (Math/max (get-svg-width) svg-width) 2)
-                                       (/ (Math/max (get-svg-height) svg-height) 2)))
+                                       (/ (get-svg-width) 2)
+                                       (/ (get-svg-height) 2)))
     (-> sim
         (.alphaTarget 0.1)
         (.restart))))
