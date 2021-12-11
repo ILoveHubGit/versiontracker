@@ -49,6 +49,7 @@
                  [org.webjars/webjars-locator "0.42"]
                  [org.webjars/webjars-locator-jboss-vfs "0.1.0"]
                  [re-frame "1.2.0"]
+                 [rid3 "0.2.2"]
                  [reagent "1.1.0"]
                  [ring-webjars "0.2.0"]
                  [ring/ring-core "1.9.4"]

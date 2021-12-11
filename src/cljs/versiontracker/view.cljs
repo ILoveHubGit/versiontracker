@@ -7,7 +7,9 @@
             [versiontracker.validation :as vt-vali]
             [versiontracker.forms.controls :as vt-form]
             [versiontracker.table :as vt-tabl]
-            [versiontracker.graph :as vt-grap]))
+            [versiontracker.graphrid3 :as vt-grap]
+            [versiontracker.events :as vt-even]
+            [versiontracker.subs :as vt-subs]))
 
 (def log (.-log js/console))
 
@@ -50,7 +52,7 @@
     [:div.column.is-narrow {:id "search"}
      [:div.box
       [vt-form/dropdown :environments [:name] [:id]
-       (into [] (concat [{:id 0 :name "Choose your environment ..."}] @(rf/subscribe [:environments])))
+       (into [] (concat [{:id 0 :name "Choose your environment ..."}] @(rf/subscribe [::vt-subs/environments])))
        :id :name
        {:label "Environments" :field-classes ["is-info is-light"]}]
       [vt-form/text-input :environments [:date] ::vt-vali/date "Wrong date format"
@@ -58,16 +60,16 @@
       [:div.columns
         [:div.column
          [:button.button.is-info
-          {:on-click #(rf/dispatch [:ret-links])}
+          {:on-click #(rf/dispatch [::vt-even/ret-links])}
           "Get Interfaces"]]
         [:div.column
-         (when-not (or (nil? @(rf/subscribe [:links]))
-                       (= "No data" @(rf/subscribe [:links])))
-          [:div [:a {:href @(rf/subscribe [:ret-pdf]) :target "_blank"} [:button.button.is-info "PDF"]]])]]]]
+         (when-not (or (nil? @(rf/subscribe [::vt-subs/links]))
+                       (= "No data" @(rf/subscribe [::vt-subs/links])))
+          [:div [:a {:href @(rf/subscribe [::vt-subs/ret-pdf]) :target "_blank"} [:button.button.is-info "PDF"]]])]]]]
     [:div.column
      ; [:div.container
      ;  [:div.content
-       (when-let [links @(rf/subscribe [:links])]
+       (when-let [links @(rf/subscribe [::vt-subs/links])]
         [:div.box
          [:div.tabs {:id "tabs"}
           [:ul

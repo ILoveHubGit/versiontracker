@@ -97,13 +97,13 @@ circle.Node {
 
 circle.SubNode {
 /*	fill: #81D4FA;*/
-	fill: #81D455;
+	fill: #80CBC4;
   stroke: #777;
   stroke-width: 2.5px;
 }
 
 circle.Interface {
-	fill: #80CBC4;
+	fill: #81D455;
   stroke: #777;
   stroke-width: 1.5px;
 }
