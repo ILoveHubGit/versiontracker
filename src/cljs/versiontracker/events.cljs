@@ -27,13 +27,13 @@
   ::svg-width
   (fn [{:keys [db]} [_]]
     {:db (-> db
-             (assoc-in [:clinks :svg-width] (min (.-width (g-dom/getViewportSize (g-dom/getWindow))) (.-width (g-sty/getTransformedSize (g-dom/getElement "graph"))))))}))
+             (assoc-in [:clinks :svg-width] (max 600 (min (.-width (g-dom/getViewportSize (g-dom/getWindow))) (.-width (g-sty/getTransformedSize (g-dom/getElement "graph")))))))}))
 
 (kf/reg-event-fx
   ::svg-height
   (fn [{:keys [db]} [_]]
     {:db (-> db
-             (assoc-in [:clinks :svg-height] (- (.-height (g-dom/getViewportSize (g-dom/getWindow))) (.-y (g-sty/getPosition (g-dom/getElement "graph"))))))}))
+             (assoc-in [:clinks :svg-height] (max 400 (- (.-height (g-dom/getViewportSize (g-dom/getWindow))) (.-y (g-sty/getPosition (g-dom/getElement "graph")))))))}))
 
 (kf/reg-chain
   ::ret-links

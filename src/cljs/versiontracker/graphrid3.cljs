@@ -5,6 +5,9 @@
             [versiontracker.subs :as vt-subs]))
 
 (declare sim-did-update)
+(declare drag-started)
+(declare dragged)
+(declare drag-ended)
 
 (enable-console-print!)
 (def log (.-log js/console))
@@ -55,8 +58,38 @@
                                           (.attr "class" (fn [d] (case (str (first (.-id d)))
                                                                        "I" "Interface"
                                                                        "N" "Node"
-                                                                       "S" "SubNode"))))]
+                                                                       "S" "SubNode")))
+                                          (.call (-> js/d3
+                                                     (.drag)
+                                                     (.on "start" drag-started)
+                                                     (.on "drag" dragged)
+                                                     (.on "end" drag-ended))))]
                                 (rf/dispatch-sync [::vt-even/set-var :node-elems r])))
+                 :prepare-dataset (fn [ratom]
+                                    (-> @ratom
+                                        (get :nodes)
+                                        clj->js))}
+                {:kind :elem-with-data
+                 :tag "text"
+                 :class "names"
+                 :did-mount (fn [node ratom]
+                              (let [r (-> node
+                                          (.attr "font-size" "0.8rem")
+                                          (.attr "font-weight" "bold")
+                                          (.text (fn [d] (.-name d))))]
+                                (rf/dispatch-sync [::vt-even/set-var :name-elems r])))
+                 :prepare-dataset (fn [ratom]
+                                    (-> @ratom
+                                        (get :nodes)
+                                        clj->js))}
+                {:kind :elem-with-data
+                 :tag "text"
+                 :class "versions"
+                 :did-mount (fn [node ratom]
+                              (let [r (-> node
+                                          (.attr "font-size" "0.8rem")
+                                          (.text (fn [d] (.-version d))))]
+                                (rf/dispatch-sync [::vt-even/set-var :vers-elems r])))
                  :prepare-dataset (fn [ratom]
                                     (-> @ratom
                                         (get :nodes)
@@ -72,8 +105,10 @@
 
 (defn graph-view
   [select-view]
-  [:div {:hidden @select-view}
-   (main-panel)])
+  (let [width (rf/dispatch [::vt-even/svg-width])
+        height (rf/dispatch [::vt-even/svg-height])]
+    [:div {:hidden @select-view}
+     (main-panel)]))
 
 (defn sim-did-update [ratom]
   (log "Sim is called")
@@ -89,12 +124,14 @@
                                                     (/ (:svg-height @ratom) 2)))
                 (.force "collision" (-> js/d3
                                         (.forceCollide)
-                                        (.radius (* 1.2 (get-radius))))))
+                                        (.radius (* 1.25 (get-radius))))))
         node-dataset (clj->js (-> @ratom
                                   (get :nodes)))
         link-dataset (clj->js (-> @ratom
                                   (get :lines)))
         node-elems @(rf/subscribe [::vt-subs/get-var :node-elems])
+        name-elems @(rf/subscribe [::vt-subs/get-var :name-elems])
+        vers-elems @(rf/subscribe [::vt-subs/get-var :vers-elems])
         link-elems @(rf/subscribe [::vt-subs/get-var :link-elems])
         radius (get-radius)
         tick-handler (fn []
@@ -108,6 +145,18 @@
                                          (.-x (get node-dataset idx))))
                            (.attr "cy" (fn [_ idx]
                                          (.-y (get node-dataset idx)))))
+
+                       (-> name-elems
+                           (.attr "x" (fn [_ idx]
+                                        (- (.-x (get node-dataset idx)) (/ radius 2))))
+                           (.attr "y" (fn [_ idx]
+                                        (- (.-y (get node-dataset idx)) 5))))
+
+                       (-> vers-elems
+                           (.attr "x" (fn [_ idx]
+                                        (- (.-x (get node-dataset idx)) (/ radius 2))))
+                           (.attr "y" (fn [_ idx]
+                                        (+ (.-y (get node-dataset idx)) 7))))
 
                        (-> link-elems
                            (.attr "x1" (fn [_ idx]
@@ -136,3 +185,26 @@
     ;; Add collision force to simulation
     (-> sim
         (.force "collision"))))
+
+(defn drag-started [d idx]
+  (let [sim @(rf/subscribe [::vt-subs/get-var :node-elems])
+        d (-> sim (get idx))]
+    (when (= 0 (-> js/d3 .-event .-active))
+      (-> sim (.alphaTarget 0.3) (.restart)))
+    (set! (.-fx d) (.-x d))
+    (set! (.-fy d) (.-y d))))
+
+
+(defn dragged [_ idx]
+  (let [sim @(rf/subscribe [::vt-subs/get-var :sim])
+        d (-> sim .nodes (get idx))]
+    (set! (.-fx d) (.-x js/d3.event))
+    (set! (.-fy d) (.-y js/d3.event))))
+
+(defn drag-ended [_ idx]
+  (let [sim @(rf/subscribe [::vt-subs/get-var :sim])
+        d (-> sim .nodes (get idx))]
+    (when (= 0 (-> js/d3 .-event .-active))
+      (-> sim (.alphaTarget 0)))
+    (set! (.-fx d) nil)
+    (set! (.-fy d) nil)))
