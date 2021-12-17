@@ -21,11 +21,9 @@
 
 (defn get-radius []
   (let [radius (/ @(rf/subscribe [::vt-subs/svg-width]) 45)]
-    ; (log "Radius: " radius)
     radius))
 
 (defn force-viz [ratom]
-  (log "Force-viz is called")
   (let [radius (get-radius)]
     [rid3/viz
       {:id "force"
@@ -111,7 +109,6 @@
      (main-panel)]))
 
 (defn sim-did-update [ratom]
-  (log "Sim is called")
   (let [sim (-> (js/d3.forceSimulation)
                 (.force "link" (-> js/d3
                                    (.forceLink)
@@ -125,6 +122,7 @@
                 (.force "collision" (-> js/d3
                                         (.forceCollide)
                                         (.radius (* 1.25 (get-radius))))))
+        _ (rf/dispatch-sync [::vt-even/set-var :sim sim])
         node-dataset (clj->js (-> @ratom
                                   (get :nodes)))
         link-dataset (clj->js (-> @ratom
@@ -186,25 +184,25 @@
     (-> sim
         (.force "collision"))))
 
-(defn drag-started [d idx]
-  (let [sim @(rf/subscribe [::vt-subs/get-var :node-elems])
-        d (-> sim (get idx))]
-    (when (= 0 (-> js/d3 .-event .-active))
+(defn drag-started [event idx]
+  (let [sim @(rf/subscribe [::vt-subs/get-var :sim])
+        d (first (->> sim .nodes (filter #(= (.-id idx) (.-id %)))))]
+    (when (= 0 (-> event .-active))
       (-> sim (.alphaTarget 0.3) (.restart)))
     (set! (.-fx d) (.-x d))
     (set! (.-fy d) (.-y d))))
 
 
-(defn dragged [_ idx]
+(defn dragged [event idx]
   (let [sim @(rf/subscribe [::vt-subs/get-var :sim])
-        d (-> sim .nodes (get idx))]
-    (set! (.-fx d) (.-x js/d3.event))
-    (set! (.-fy d) (.-y js/d3.event))))
+        d (first (->> sim .nodes (filter #(= (.-id idx) (.-id %)))))]
+    (set! (.-fx d) (.-x event))
+    (set! (.-fy d) (.-y event))))
 
-(defn drag-ended [_ idx]
+(defn drag-ended [event idx]
   (let [sim @(rf/subscribe [::vt-subs/get-var :sim])
-        d (-> sim .nodes (get idx))]
-    (when (= 0 (-> js/d3 .-event .-active))
+        d (first (->> sim .nodes (filter #(= (.-id idx) (.-id %)))))]
+    (when (= 0 (-> event .-active))
       (-> sim (.alphaTarget 0)))
     (set! (.-fx d) nil)
     (set! (.-fy d) nil)))
