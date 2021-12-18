@@ -65,3 +65,45 @@ body {
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
 }
+
+svg.graph {
+    /* display:block;
+    border:0px solid #ccc; */
+    /* position:absolute;
+    top:6%;
+    left:1%;
+    width:98%;
+    height:90%; */
+    /*background:#0066a1;*/
+		background-color: "#555555";
+    font-family: "sans-serif";
+    font-size: 12px;
+}
+
+.lines line {
+    stroke: #555;
+    stroke-opacity: 0.6;
+}
+
+.nodes text {
+    fill: #333;
+}
+
+circle.Node {
+	fill: #B39DDB;
+  stroke: #777;
+  stroke-width: 2.5px;
+}
+
+circle.SubNode {
+/*	fill: #81D4FA;*/
+	fill: #80CBC4;
+  stroke: #777;
+  stroke-width: 2.5px;
+}
+
+circle.Interface {
+	fill: #81D455;
+  stroke: #777;
+  stroke-width: 1.5px;
+}
