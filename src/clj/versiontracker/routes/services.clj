@@ -184,7 +184,7 @@
              :headers {"Content-Type" "application/pdf"}
              :handler (fn [{{{:keys [env-name]} :path
                              {:keys [date]} :query} :parameters}]
-                         (log/info (str "env-name: " env-name " date: " date))
+                         (log/info (str "API call Get PDF | env-name: " env-name " date: " date))
                          {:status 200
                           :body (vt-expo/create-pdf env-name date)})}}]
 

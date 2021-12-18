@@ -1,4 +1,4 @@
-(defproject versiontracker "0.2.1"
+(defproject versiontracker "0.2.2"
 
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
@@ -11,7 +11,6 @@
                  [clj-http "3.12.3"]
                  [clj-pdf "2.5.8"]
                  [cljs-ajax "0.8.4"]
-                 ; [cljsjs/d3 "4.12.0-0"]
                  [clojure-interop/java.io "1.0.5"]
                  [clojure.java-time "0.3.3"]
                  [com.cognitect/transit-clj "1.0.324"]

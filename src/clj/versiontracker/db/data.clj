@@ -20,15 +20,16 @@
    env - Devus esti mapo kun :name (bezonata) kaj :comment (nedeviga)"
   [env]
   (try
-    (let [ret-val (db/create-environment! env)
+    (let [env-emp {:name nil :comment nil}
+          ret-val (db/create-environment! (merge env-emp env))
           env-id  (case (db-type)
                     :h2        (:id (first ret-val))
                     :sqlserver (int (:generated_keys (first ret-val))))]
       (log/info (str "Environment with name: " (:name env) " create with ID: " env-id))
       env-id)
     (catch Exception e
-         (log/error (str "Error inserting to db " e))
-         {:result (str "Error inserting to db " e)})))
+           (log/error (str "Error inserting to db " e))
+           {:result (str "Error inserting to db " e)})))
 
 (defn ret-environments
   "Retrieves the list of environments
@@ -70,27 +71,31 @@
                                (when (= 1 nr-ids)
                                  (auto-enter-links k-id v-id ids :source-func source-func
                                                                  :target-func target-func))
-                               (id-func {:db-type (db-type) :ids [(last nods)]})
-                               (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids [(last nods)]})
-                               (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids [(last nods)]})
+                               ;; Only neede to call the inactivation functions if there is at least one to be deactivated
+                               (when (> (count (last nods)) 0)
+                                 (id-func {:db-type (db-type) :ids [(last nods)]})
+                                 (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids [(last nods)]})
+                                 (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids [(last nods)]}))
                                ;; If there were more than 1 old link we first remove the oldest before creating the new link
                                (when-not (= 1 nr-ids)
                                  (auto-enter-links k-id v-id ids :source-func source-func
                                                                  :target-func target-func))))
             "Last"         (do
                              ;; If there is only one old link keep it
-                             (id-func {:db-type (db-type) :ids (if (= 1 (count nods)) nods (rest nods))})
-                             (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids (rest nods)})
-                             (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids (rest nods)})
+                             (when (> (count nods) 1)
+                              (id-func {:db-type (db-type) :ids (rest nods)})
+                              (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids (rest nods)})
+                              (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids (rest nods)}))
                              (auto-enter-links k-id v-id ids :source-func source-func
                                                              :target-func target-func))
             "None"         (do
                              ;; If none to be kept, make the link to the new node before removing them
                              (auto-enter-links k-id v-id [(last ids)] :source-func source-func
                                                                       :target-func target-func)
-                             (id-func {:db-type (db-type) :ids nods})
-                             (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids nods})
-                             (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids nods}))))))
+                             (when (> (count nods) 0)
+                               (id-func {:db-type (db-type) :ids nods})
+                               (db/inactivate-sources! {:db-type (db-type) :id-type id-type :ids nods})
+                               (db/inactivate-targets! {:db-type (db-type) :id-type id-type :ids nods})))))))
 
 
 ;; Nodes
@@ -104,9 +109,10 @@
   (let [env-id (db-check/exist_env env-name)
         nod-ids (db/get-active-nodes {:env_id env-id :name (:name node)})]
     (if (nil? env-id)
-      {:result "Environment must exists before adding a node"}
-      (try
-          (let [ret-val (db/create-node! (merge {:env_id env-id} node))
+        {:result "Environment must exists before adding a node"}
+        (try
+          (let [nod-emp {:name nil :version nil :type nil :deploymentdate nil :comment nil}
+                ret-val (db/create-node! (merge {:env_id env-id} (merge nod-emp node)))
                 nod-id  (case (db-type)
                            :h2        (:id (first ret-val))
                            :sqlserver (int (:generated_keys (first ret-val))))]
@@ -118,9 +124,9 @@
                                :source-func #(db/get-active-sources-for-node %)
                                :target-func #(db/get-active-targets-for-node %)))
              nod-id)
-        (catch Exception e
-               (log/error (str "Error inserting to db: " e))
-               {:result (str "Error inserting to db: " e)})))))
+          (catch Exception e
+                 (log/error (str "Error inserting to db: " e))
+                 {:result (str "Error inserting to db: " e)})))))
 
 (defn ret-nodes
   "Retrieves a list of nodes from an environment
@@ -129,14 +135,14 @@
   [env-name date]
   (let [env-id (db-check/exist_env env-name)]
     (if (nil? env-id)
-     {:result "Cannot find the environment for requested node"}
-     (let [base {:db-type (db-type) :env_id env-id}
-           params (if-not (nil? date)
-                    (assoc base :date date)
-                    base)]
+      {:result "Cannot find the environment for requested node"}
+      (let [base {:db-type (db-type) :env_id env-id}
+            params (if-not (nil? date)
+                     (assoc base :date date)
+                     base)]
         (log/info "ret-nodes | Get the nodes for environment: " env-name)
         (log/info (str "ret-nodes | Parameters for retrieving the nodes: " params))
-       (db/get-nodes params)))))
+        (db/get-nodes params)))))
 
 ;; SubNodes
 (defn add-subnode!
@@ -150,12 +156,13 @@
         nod-id (db-check/exist_node env-id nod-name nod-version)
         sub-ids (db/get-active-subnodes {:nod_id nod-id :name (:name subnode)})]
     (if (nil? nod-id)
-     {:result "Either Environment or Node does not exist"}
-     (try
-       (let [ret-val (db/create-subnode! (merge {:nod_id nod-id} subnode))
-             sub-id  (case (db-type)
-                       :h2 (:id (first ret-val))
-                       :sqlserver (int (:generated_keys (first ret-val))))]
+      {:result "Either Environment or Node does not exist"}
+      (try
+        (let [sno-emp {:name nil :version nil :deploymentdate nil :comment nil}
+              ret-val (db/create-subnode! (merge {:nod_id nod-id} (merge sno-emp subnode)))
+              sub-id  (case (db-type)
+                        :h2 (:id (first ret-val))
+                        :sqlserver (int (:generated_keys (first ret-val))))]
           (log/info (str "add-subnode! | SubNode with name: " (:name subnode) " created with ID: " sub-id " in environment: " env-name))
           (log/info (str "Sub-ids: " sub-ids))
           (when (seq sub-ids)
@@ -164,10 +171,10 @@
                             :id-func #(db/inactivate-subnodes! %)
                             :source-func #(db/get-active-sources-for-subnode %)
                             :target-func #(db/get-active-targets-for-subnode %)))
-         {:result "SubNode succesfully added"})
-       (catch Exception e
+          {:result "SubNode succesfully added"})
+        (catch Exception e
                (log/error (str "add-subnode! | Error inserting to db: " e))
-        {:result (str "Error inserting to db: " e)})))))
+               {:result (str "Error inserting to db: " e)})))))
 
 
 (defn ret-subnodes
@@ -178,13 +185,13 @@
   (let [env-id (db-check/exist_env env-name)
         nod-id (db-check/exist_node env-id nod-name nod-version)]
     (if (nil? nod-id)
-     {:result "Either Environment or Node does not exist"}
-     (let [base {:db-type (db-type) :nod_id nod-id}
-           params (if-not (nil? date)
-                    (assoc base :date date)
-                    base)]
+      {:result "Either Environment or Node does not exist"}
+      (let [base {:db-type (db-type) :nod_id nod-id}
+            params (if-not (nil? date)
+                     (assoc base :date date)
+                     base)]
         (log/info "ret-subnodes | Get the nodes for environment: " env-name " and node: " nod-name " - " nod-version)
-       (db/get-subnodes params)))))
+        (db/get-subnodes params)))))
 
 (defn add-interface!
   "Adds a new interface to an environment in case it does not exist yet and returns its ID
@@ -193,13 +200,13 @@
   [{:keys [env-id name version type deploymentdate comment]}]
   (log/info (str "add-interface! | Add link name: " name " - " version "with type: " type " to environment with id: " env-id))
   (try
-       (let [ret-val (db/create-link! {:env_id env-id :name name :version version :type type :deploymentdate deploymentdate :comment comment})]
-         (case (db-type)
-           :h2 (:id (first ret-val))
-           :sqlserver (int (:generated_keys (first ret-val)))))
-       (catch Exception e
-              (log/error (str "Error inserting link to db: " e))
-              {:result (str "Error inserting link to db: " e)})))
+    (let [ret-val (db/create-link! {:env_id env-id :name name :version version :type type :deploymentdate deploymentdate :comment comment})]
+      (case (db-type)
+        :h2 (:id (first ret-val))
+        :sqlserver (int (:generated_keys (first ret-val)))))
+    (catch Exception e
+           (log/error (str "Error inserting link to db: " e))
+           {:result (str "Error inserting link to db: " e)})))
 
 (defn add-source-or-target!
   "Adds new source or target to a link in the environment
@@ -232,7 +239,6 @@
         (log/info (str "add-source-or-target! | " (cstr/capitalize (name side)) ": " Node " - " Version " / " SubNode " - " SubVersion "successfully addedto the link"))
         {:result (str (cstr/capitalize (name side)) " succesfully added to the link")}))))
 
-
 (defn add-link!
   "Adds new link to an environment
 
@@ -244,7 +250,8 @@
         lin-ids (db/get-active-links {:env_id env-id :name (:name link)})]
     (if (nil? env-id)
       {:result "Environment must exists before adding a link"}
-      (let [lin-id (add-interface! (merge {:env-id env-id} link))]
+      (let [lin-emp {:name nil :version nil :type nil :deploymentdate nil :comment nil}
+            lin-id (add-interface! (merge {:env-id env-id} (merge lin-emp link)))]
         (when (int? lin-id)
           (do
             (log/info (str "add-link! | Link with name: " (:name link) " created with ID: " lin-id " in environment: " env-name))
@@ -256,12 +263,12 @@
                               :target-func #(db/get-active-targets-for-link %)))
             (let [source (:source link)
                   sou-in (when-not (and (int? lin-id) (nil? source))
-                                 (log/info (str "add-link! | Adding source to link"))
-                                 (add-source-or-target! :source env-id lin-id source))
+                           (log/info (str "add-link! | Adding source to link"))
+                           (add-source-or-target! :source env-id lin-id source))
                   target (:target link)
                   tar-in (when-not (and (int? lin-id) (nil? target))
-                                 (log/info (str "add-link! | Adding target to link"))
-                                 (add-source-or-target! :target env-id lin-id target))])))
+                           (log/info (str "add-link! | Adding target to link"))
+                           (add-source-or-target! :target env-id lin-id target))])))
        (if (int? lin-id)
          {:result "The link was succesfully added"}
          {:result "The link already exists, use add source or add target"})))))
@@ -300,9 +307,9 @@
   [env-name date]
   (let [env-id (db-check/exist_env env-name)
         base {:db-type (db-type) :env_id env-id}
-          params (if-not (nil? date)
-                   (assoc base :date date)
-                   base)]
+        params (if-not (nil? date)
+                 (assoc base :date date)
+                 base)]
     (map prepare-links (db/get-links params))))
 
 (defn add-node-to-link!

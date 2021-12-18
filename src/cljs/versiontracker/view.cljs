@@ -38,11 +38,7 @@
 (defn footer []
   [:footer.myFooter.is-light
    [:div.content.has-text-centered
-     "© 2021 ILoveHubGit: Version Tracker Version: 0.2.1"]])
-
-(defn about-page []
-  [:section.section>div.container>div.content
-   [:img {:src "/img/warning_clojure.png"}]])
+     "© 2021 ILoveHubGit: Version Tracker Version: 0.2.2"]])
 
 (def select-view (r/atom true))
 
@@ -83,7 +79,6 @@
              (do
                (vt-grap/remove-svg)
                (vt-grap/graph-view select-view)))]])]]])
-
 
 (defn root-component []
   [:div

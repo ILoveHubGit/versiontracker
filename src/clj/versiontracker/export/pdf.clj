@@ -22,7 +22,8 @@
       :footer {:text "Created by Version Tracker   Page"
                :footer-separator " - "}
       :pages true
-      :orientation :landscape}
+      :orientation :landscape
+      :author "Version Tracker"}
      [:heading {:style {:align :center}} (str "Environment: " env-name)]
      [:heading {:style {:align :center :size 12}} (str "Created on: " (new java.util.Date))]
      (when-not (nil? date)
