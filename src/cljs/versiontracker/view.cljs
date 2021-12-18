@@ -1,12 +1,15 @@
 (ns versiontracker.view
   (:require [clojure.string :as c-str]
             [kee-frame.core :as kf]
-            [markdown.core :refer [md->html]]
             [reagent.core :as r]
             [re-frame.core :as rf]
             [versiontracker.about :as vt-abou]
             [versiontracker.validation :as vt-vali]
-            [versiontracker.forms.controls :as forms]))
+            [versiontracker.forms.controls :as vt-form]
+            [versiontracker.table :as vt-tabl]
+            [versiontracker.graphrid3 :as vt-grap]
+            [versiontracker.events :as vt-even]
+            [versiontracker.subs :as vt-subs]))
 
 (def log (.-log js/console))
 
@@ -37,97 +40,45 @@
    [:div.content.has-text-centered
      "© 2021 ILoveHubGit: Version Tracker Version: 0.2.2"]])
 
-(defn make-row
-  [link]
-  (let [type (c-str/lower-case (:type link))]
-    [:tr
-     [:td (:Node (:source link))]
-     [:td (:Version (:source link))]
-     [:td (:SubNode (:source link))]
-     [:td (:SubVersion (:source link))]
-     [:td [:abbr {:title (str "Deployed on: " (:deploymentdate link))} (:name link)]]
-     [:td (:version link)]
-     [:td [:img {:src (str "/img/" type ".svg") :title type :width 32}]]
-     [:td (:insertdate link)]
-     [:td (:Node (:target link))]
-     [:td (:Version (:target link))]
-     [:td (:SubNode (:target link))]
-     [:td (:SubVersion (:target link))]]))
-
 (def select-view (r/atom true))
-
-(defn table-view
-  [links]
-  [:div {:hidden (not @select-view)}
-   (if (= links "No data")
-     [:div "No data available for this environment"]
-     [:div.table-container
-      [:table.table.is-bordered.is-striped.is-narrow.is-hoverable
-       [:thead
-        [:tr.color-blue
-         [:th.has-text-centered.has-text-white {:colSpan 4} "Source"]
-         [:th.has-text-centered.has-text-white {:colSpan 4} "Interface"]
-         [:th.has-text-centered.has-text-white {:colSpan 4} "Target"]]
-        [:tr.color-blue
-         [:th.has-text-white "Application"]
-         [:th.has-text-white "Version"]
-         [:th.has-text-white "Function"]
-         [:th.has-text-white "Sub Version"]
-         [:th.has-text-white "Interface"]
-         [:th.has-text-white "Version"]
-         [:th.has-text-white "Type"]
-         [:th.has-text-white "Date"]
-         [:th.has-text-white "Application"]
-         [:th.has-text-white "Version"]
-         [:th.has-text-white "Function"]
-         [:th.has-text-white "Sub Version"]]]
-       [:tbody
-        (map make-row links)]]])])
-
-(defn graph-view
-  [links]
-  [:div {:hidden @select-view}
-   (if (= links "No data")
-     [:div "No data available for this environment"]
-     [:div "Hier komt de graph"])])
-
 
 (defn home-page []
   [:section.section
    [:div.columns
-    [:div.column.is-narrow
+    [:div.column.is-narrow {:id "search"}
      [:div.box
-      [forms/dropdown :environments [:name] [:id]
-       (into [] (concat [{:id 0 :name "Choose your environment ..."}] @(rf/subscribe [:environments])))
+      [vt-form/dropdown :environments [:name] [:id]
+       (into [] (concat [{:id 0 :name "Choose your environment ..."}] @(rf/subscribe [::vt-subs/environments])))
        :id :name
        {:label "Environments" :field-classes ["is-info is-light"]}]
-      [forms/text-input :environments [:date] ::vt-vali/date "Wrong date format"
+      [vt-form/text-input :environments [:date] ::vt-vali/date "Wrong date format"
        {:label "Date" :field-classes []}]
       [:div.columns
-       [:div.column
-        [:button.button.is-info
-         {:on-click #(rf/dispatch [:ret-links])}
-         "Get Interfaces"]]
-       [:div.column
-        (when-not (or (nil? @(rf/subscribe [:links]))
-                      (= "No data" @(rf/subscribe [:links])))
-          [:div [:a {:href @(rf/subscribe [:ret-pdf]) :target "_blank"} [:button.button.is-info "PDF"]]])]]]]
+        [:div.column
+         [:button.button.is-info
+          {:on-click #(rf/dispatch [::vt-even/ret-links])}
+          "Get Interfaces"]]
+        [:div.column
+         (when-not (or (nil? @(rf/subscribe [::vt-subs/links]))
+                       (= "No data" @(rf/subscribe [::vt-subs/links])))
+          [:div [:a {:href @(rf/subscribe [::vt-subs/ret-pdf]) :target "_blank"} [:button.button.is-info "PDF"]]])]]]]
     [:div.column
-     [:div.container
-       [:div.content
-        (when-let [links @(rf/subscribe [:links])]
-          [:div
-           [:div.tabs.box
-            [:ul
-             [:li.is-active [:a {:on-click (fn [] (reset! select-view true) (log "Table-view: " @select-view))} "Table View"]]
-             [:li [:a {:on-click (fn [] (reset! select-view false) (log "Graph-view: " @select-view))} "Graph View"]]]]
-           [:div.box
-            (if @select-view
-              (table-view links)
-              (graph-view links))]])]]]]])
-
-
-
+     ; [:div.container
+     ;  [:div.content
+       (when-let [links @(rf/subscribe [::vt-subs/links])]
+        [:div.box
+         [:div.tabs {:id "tabs"}
+          [:ul
+           [:li {:class (when @select-view "is-active")} [:a {:on-click (fn [] (reset! select-view true) (log "Table-view: " @select-view))} "Table View"]]
+           [:li {:class (when-not @select-view "is-active")} [:a {:on-click (fn [] (reset! select-view false) (log "Graph-view: " @select-view))} "Graph View"]]]]
+         [:div {:id "graph"}
+           (if @select-view
+             (do
+               (vt-grap/remove-svg)
+               (vt-tabl/table-view links select-view))
+             (do
+               (vt-grap/remove-svg)
+               (vt-grap/graph-view select-view)))]])]]])
 
 (defn root-component []
   [:div

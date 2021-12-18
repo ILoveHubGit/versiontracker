@@ -148,7 +148,8 @@ FROM links
    Rekuperas la ligo de medio
    Params: {:db-type type :env_id ID :date "date-time"} :date is optional - estas nedeviga
 */
-SELECT l.name
+SELECT l.id AS linid
+      , l.name
       , l.type
       , l.version
       /*~
@@ -162,8 +163,8 @@ SELECT l.name
             :h2 ", FORMATDATETIME(l.timestamp, 'yyyy-MM-dd HH:mm:ss') AS insertdate"
             :sqlserver ", CONVERT(VARCHAR(25), l.timestamp, 120) AS insertdate")
       ~*/
-      , sn.name AS sourceName, sn.version AS sourceVersion, ssn.name AS sourceSubNode, ssn.version AS sourceSubVersion,
-       tn.name AS targetName, tn.version AS targetVersion, tsn.name AS targetSubNode, tsn.version AS targetSubVersion
+      , sn.id AS sid, sn.name AS sourceName, sn.version AS sourceVersion, ssn.id AS ssid, ssn.name AS sourceSubNode, ssn.version AS sourceSubVersion,
+        tn.id AS tid, tn.name AS targetName, tn.version AS targetVersion, tsn.id AS tsid, tsn.name AS targetSubNode, tsn.version AS targetSubVersion
 FROM links as l
 LEFT OUTER JOIN sources AS s ON l.id = s.lin_id
                             /*~

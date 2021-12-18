@@ -279,18 +279,23 @@
 
    Konvertu la db-rezulton al la ĝusta mapo"
   [link]
-  {:name (:name link)
+  {:id (:linid link)
+   :name (:name link)
    :type (:type link)
    :version (:version link)
    :deploymentdate (:deploymentdate link)
    :comment (:comment link)
    :insertdate (:insertdate link)
-   :source {:Node (:sourcename link)
+   :source {:id (:sid link)
+            :Node (:sourcename link)
             :Version (:sourceversion link)
+            :subid (:ssid link)
             :SubNode (:sourcesubnode link)
             :SubVersion (:sourcesubversion link)}
-   :target {:Node (:targetname link)
+   :target {:id (:tid link)
+            :Node (:targetname link)
             :Version (:targetversion link)
+            :subid (:tsid link)
             :SubNode (:targetsubnode link)
             :SubVersion (:targetsubversion link)}})
 
