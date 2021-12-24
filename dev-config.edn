@@ -7,8 +7,8 @@
  ;; when :nrepl-port is set the application starts the nREPL server on load
  :nrepl-port 7010
  ; For an H2 Database enable next two lines
- ; :database-url "jdbc:h2:./versiontracker_dev.db"
- ; :migration-dir "migrations/h2"}
+ :database-url "jdbc:h2:./versiontracker_dev.db"
+ :migration-dir "migrations/h2"}
  ;; For an MS-SQL Database enable next two lines and update :database-url for your settings
- :database-url "jdbc:sqlserver://192.168.68.124;databaseName=VersionTracker;user=jeroen;password=versiontracker"
- :migration-dir "migrations/mssql"}
+ ; :database-url "jdbc:sqlserver://192.168.68.124;databaseName=VersionTracker;user=jeroen;password=versiontracker"
+ ; :migration-dir "migrations/mssql"}

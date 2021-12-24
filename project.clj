@@ -1,4 +1,4 @@
-(defproject versiontracker "0.2.2"
+(defproject versiontracker "0.3.0"
 
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
@@ -15,7 +15,7 @@
                  [clojure.java-time "0.3.3"]
                  [com.cognitect/transit-clj "1.0.324"]
                  [com.cognitect/transit-cljs "0.8.269"]
-                 [com.h2database/h2 "2.0.202"]
+                 [com.h2database/h2 "1.4.200"]
                  [com.microsoft.sqlserver/sqljdbc4 "4.0"]
                  [conman "0.9.3"]
                  [cprop "0.1.19"]

@@ -187,6 +187,8 @@
 (defn drag-started [event idx]
   (let [sim @(rf/subscribe [::vt-subs/get-var :sim])
         d (first (->> sim .nodes (filter #(= (.-id idx) (.-id %)))))]
+    (log "Start-SIM: " sim)
+    (log "Start-D: " d)
     (when (= 0 (-> event .-active))
       (-> sim (.alphaTarget 0.3) (.restart)))
     (set! (.-fx d) (.-x d))
@@ -196,12 +198,17 @@
 (defn dragged [event idx]
   (let [sim @(rf/subscribe [::vt-subs/get-var :sim])
         d (first (->> sim .nodes (filter #(= (.-id idx) (.-id %)))))]
+    (log "Drag-SIM: " sim)
+    (log "Drag-D: " d)
+    (log "Drag-event: " event)
     (set! (.-fx d) (.-x event))
     (set! (.-fy d) (.-y event))))
 
 (defn drag-ended [event idx]
   (let [sim @(rf/subscribe [::vt-subs/get-var :sim])
         d (first (->> sim .nodes (filter #(= (.-id idx) (.-id %)))))]
+    (log "End-SIM: " sim)
+    (log "End-D: " d)
     (when (= 0 (-> event .-active))
       (-> sim (.alphaTarget 0)))
     (set! (.-fx d) nil)
