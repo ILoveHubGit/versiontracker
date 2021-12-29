@@ -191,8 +191,8 @@
     (log "Start-D: " d)
     (when (= 0 (-> event .-active))
       (-> sim (.alphaTarget 0.3) (.restart)))
-    (set! (.-fx d) (.-x d))
-    (set! (.-fy d) (.-y d))))
+    (set! (.-fx ^js d) (.-x d))
+    (set! (.-fy ^js d) (.-y d))))
 
 
 (defn dragged [event idx]
@@ -201,8 +201,8 @@
     (log "Drag-SIM: " sim)
     (log "Drag-D: " d)
     (log "Drag-event: " event)
-    (set! (.-fx d) (.-x event))
-    (set! (.-fy d) (.-y event))))
+    (set! (.-fx ^js d) (.-x event))
+    (set! (.-fy ^js d) (.-y event))))
 
 (defn drag-ended [event idx]
   (let [sim @(rf/subscribe [::vt-subs/get-var :sim])
@@ -211,5 +211,5 @@
     (log "End-D: " d)
     (when (= 0 (-> event .-active))
       (-> sim (.alphaTarget 0)))
-    (set! (.-fx d) nil)
-    (set! (.-fy d) nil)))
+    (set! (.-fx ^js d) nil)
+    (set! (.-fy ^js d) nil)))

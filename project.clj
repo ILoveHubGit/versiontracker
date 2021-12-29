@@ -62,7 +62,8 @@
   :test-paths ["test/clj"]
   :resource-paths ["resources" "target/cljsbuild"]
   :target-path "target/%s/"
-  :main ^:skip-aot versiontracker.core
+  ; :main ^:skip-aot versiontracker.core
+  :main versiontracker.core
   ;; Line below added to make sure log4j is not used
   :jvm-opts ["-Dclojure.tools.logging.factory=clojure.tools.logging.impl/slf4j-factory"]
   :plugins [[lein-kibit "0.1.2"]
@@ -77,6 +78,7 @@
    :builds
    {:app
     {:target :browser
+     ; :compiler-options {:infer-externs :auto}
      :output-dir "target/cljsbuild/public/js"
      :asset-path "/js"
      :modules {:app {:entries [versiontracker.app]}}
